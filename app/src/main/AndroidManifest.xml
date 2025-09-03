@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2025 Simone Esposito
+  SPDX-License-Identifier: Apache-2.0
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <!-- Prevent unintended inclusions by dependencies -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    
+    <!-- Hardware features -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.biometrics" android:required="false" />
+    <uses-feature android:name="android.hardware.fingerprint" android:required="false" />
+
+    <application
+        android:name=".app.OpenWalletApplication"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.OpenWallet">
+        <activity
+            android:name=".app.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.OpenWallet"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleTop"
+            android:clearTaskOnLaunch="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            
+            <!-- Handle PKPass files -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" 
+                      android:mimeType="*/*"
+                      android:host="*.pkpass"
+                      android:pathPattern=".*\\.pkpass" />
+            </intent-filter>
+            
+            <!-- Handle Google Wallet JSON files -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" 
+                      android:mimeType="application/json" />
+            </intent-filter>
+
+            <!-- Handle wallet-specific files -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content"
+                      android:mimeType="*/*"
+                      android:host="*.walletpass"
+                      android:pathPattern=".*\\.walletpass" />
+            </intent-filter>
+            
+            <!-- Handle PKPass MIME type -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" 
+                      android:mimeType="application/vnd.apple.pkpass" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".feature.authentication.ui.AuthenticationActivity"
+            android:exported="false"
+            android:label="@string/authentication_label"
+            android:theme="@style/Theme.OpenWallet"
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
+        <activity
+            android:name=".feature.settings.ui.SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity" />
+
+        <activity
+            android:name=".feature.passmanagement.ui.PassCreationActivity"
+            android:exported="false"
+            android:label="@string/create_pass"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".feature.creditcard.ui.AddCreditCardActivity"
+            android:exported="false"
+            android:label="@string/add_credit_card"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".feature.creditcard.ui.CreditCardCreationActivity"
+            android:exported="false"
+            android:label="@string/create_credit_card_label"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".feature.creditcard.ui.AddCreditCardActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".feature.creditcard.ui.CreditCardDetailActivity"
+            android:exported="false"
+            android:label="@string/credit_card_details"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity" />
+
+        <activity
+            android:name=".feature.passmanagement.ui.PassDetailActivity"
+            android:exported="false"
+            android:label="@string/pass_details"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity" />
+
+        <activity
+            android:name=".feature.scanning.ui.BarcodeScanActivity"
+            android:exported="false"
+            android:label="@string/scan_barcode_title"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity" />
+
+        <activity
+            android:name=".feature.scanning.ui.CreditCardScanActivity"
+            android:exported="false"
+            android:label="@string/scan_credit_card"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".feature.creditcard.ui.CreditCardCreationActivity" />
+
+        <activity
+            android:name=".feature.cryptowallet.ui.CryptoWalletCreationActivity"
+            android:exported="false"
+            android:label="@string/add_crypto_wallet"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".feature.cryptowallet.ui.CryptoWalletDetailActivity"
+            android:exported="false"
+            android:label="@string/crypto_wallet"
+            android:theme="@style/Theme.OpenWallet"
+            android:parentActivityName=".app.MainActivity" />
+
+        <activity
+            android:name=".feature.authentication.ui.OnboardingActivity"
+            android:exported="false"
+            android:label="@string/welcome_label"
+            android:theme="@style/Theme.OpenWallet" />
+
+        <service
+            android:name=".feature.qs.OpenWalletQSTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_qs_wallet"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true" />
+        </service>
+    </application>
+
+</manifest>

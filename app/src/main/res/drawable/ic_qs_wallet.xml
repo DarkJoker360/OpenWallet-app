@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: Google Fonts / Google LLC
+     SPDX-License-Identifier: Apache-2.0
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <path
+        android:pathData="M180,840q-23,0 -41.5,-18T120,780v-600q0,-23 18.5,-41.5T180,120h600q24,0 42,18.5t18,41.5v54L538,234q-58,0 -96,38t-38,95v227q0,57 38,95t96,38h302v53q0,24 -18,42t-42,18L180,840ZM538,667q-34,0 -54,-20t-20,-53v-227q0,-34 20,-53.5t54,-19.5h269q34,0 54,19.5t20,53.5v227q0,33 -20,53t-54,20L538,667ZM652,544q25,0 44.5,-19.5T716,479q0,-25 -19.5,-44T652,416q-25,0 -44.5,19T588,479q0,26 19.5,45.5T652,544Z"
+        android:fillColor="#FFFFFF" />
+</vector>

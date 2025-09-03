@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2025 LAPS / Flaticons
+  SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Original drawable took from https://www.flaticon.com/packs/cryptocurrency-logo and adapted -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:viewportWidth="512"
+    android:viewportHeight="512"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:scaleX="0.1"
+        android:scaleY="-0.1"
+        android:translateY="512">
+        <path
+            android:pathData="M2273 4182c-50 -169 -182 -612 -294 -984l-202 -677 -31 -10c-17 -5 -123 -39 -236 -76l-205 -65 -49 -176c-27 -96 -46 -177 -43 -180 3 -3 104 26 224 64 119 39 220 69 222 66 4 -3 -375 -1286 -396 -1341 -4 -10 244 -13 1221 -13l1225 0 30 98c17 53 64 204 104 334l74 238 -830 0c-785 0 -829 1 -825 18 3 9 67 229 143 487l137 471 216 69 216 70 52 180c28 99 50 181 49 183 -1 1 -93 -27 -205 -63 -111 -36 -206 -65 -210 -63 -3 2 103 377 236 833 134 457 244 833 244 838 0 4 -174 7 -387 7l-388 0 -92 -308z"
+            android:fillColor="@android:color/white" />
+    </group>
+</vector>

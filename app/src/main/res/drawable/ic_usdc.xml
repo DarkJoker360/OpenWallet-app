@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2025 LAPS / Flaticons
+  SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Original drawable took from https://www.flaticon.com/packs/cryptocurrency-logo and adapted -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:viewportWidth="512"
+    android:viewportHeight="512"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:scaleX="0.1"
+        android:scaleY="-0.1"
+        android:translateY="512">
+        <path
+            android:pathData="M3090 4412l0 -189 63 -23c102 -36 276 -124 367 -185 396 -267 657 -657 752 -1126 20 -98 23 -143 23 -329 0 -184 -4 -231 -23 -329 -122 -608 -546 -1103 -1119 -1311l-63 -23 0 -189 0 -190 33 7c145 32 431 163 597 273 495 330 816 824 921 1417 32 183 33 501 1 685 -117 685 -541 1254 -1157 1555 -121 59 -287 123 -362 140l-33 7 0 -190z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M1865 4551c-1062 -371 -1643 -1502 -1329 -2588 37 -128 122 -326 194 -453 213 -372 553 -683 945 -865 91 -42 289 -115 313 -115 9 0 12 52 12 189l0 190 -57 21c-485 181 -875 590 -1039 1087 -63 193 -79 302 -79 543 0 185 3 231 23 328 122 605 532 1091 1100 1304l52 19 0 190c0 145 -3 189 -12 189 -7 0 -62 -17 -123 -39z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M2370 3805l0 -175 -27 -5c-152 -33 -258 -90 -369 -200 -124 -124 -184 -263 -184 -426 0 -201 108 -354 323 -459 118 -57 198 -81 392 -115 217 -39 299 -70 373 -139 53 -49 72 -95 72 -173 0 -192 -147 -303 -401 -303 -240 0 -370 104 -404 323l-6 37 -196 0 -195 0 7 -67c28 -277 172 -451 442 -533 39 -12 93 -25 120 -28l48 -7 3 -178 2 -177 180 0 180 0 0 173 0 172 93 22c50 12 130 41 177 64 216 107 350 340 338 588 -3 74 -9 98 -39 162 -103 214 -348 357 -696 404 -214 29 -304 59 -367 121 -41 41 -56 84 -56 157 0 222 292 340 547 220 92 -43 173 -157 173 -244 0 -60 -4 -59 192 -59l180 0 -7 67c-30 279 -196 485 -458 568l-72 23 -3 181 -2 181 -180 0 -180 0 0 -175z"
+            android:fillColor="@android:color/white" />
+    </group>
+</vector>

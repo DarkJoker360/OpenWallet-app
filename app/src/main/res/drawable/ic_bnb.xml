@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SPDX-FileCopyrightText: 2025 LAPS / Flaticons
+  SPDX-License-Identifier: Apache-2.0
+-->
+<!-- Original drawable took from https://www.flaticon.com/packs/cryptocurrency-logo and adapted -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:viewportWidth="512"
+    android:viewportHeight="512"
+    android:width="24dp"
+    android:height="24dp">
+    <group
+        android:scaleX="0.1"
+        android:scaleY="-0.1"
+        android:translateY="512">
+        <path
+            android:pathData="M2008 4337c-296 -172 -538 -314 -538 -317 0 -8 388 -230 402 -230 6 0 164 88 350 195l338 196 339 -196c186 -107 344 -195 350 -195 14 0 401 222 401 230 0 9 -1079 630 -1093 629 -6 0 -254 -141 -549 -312z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M960 3731l-205 -119 -3 -225 -2 -225 197 -114c108 -62 200 -114 205 -116 4 -2 8 97 8 220l1 223 201 115c111 63 202 119 202 124 1 6 -355 219 -389 232 -5 2 -102 -50 -215 -115z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M3747 3733c-108 -63 -195 -118 -193 -122 2 -3 95 -58 205 -121l200 -115 1 -222c0 -123 2 -223 4 -223 3 0 95 52 205 116l201 116 -2 225 -3 225 -205 119c-113 66 -207 119 -210 118 -3 0 -94 -52 -203 -116z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M2367 3731c-104 -60 -188 -112 -189 -117 0 -7 369 -224 383 -224 8 0 369 207 382 219 7 7 -330 210 -374 225 -8 3 -99 -43 -202 -103z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M1660 3322l-205 -118 0 -224 0 -225 347 -200 348 -200 0 -420 0 -421 205 -118 205 -118 205 118 205 118 0 421 1 420 347 200 347 200 0 225 0 224 -204 118c-112 65 -208 118 -212 118 -5 0 -160 -88 -346 -195 -189 -109 -344 -193 -352 -190 -8 3 -162 91 -342 195 -181 105 -332 190 -336 190 -4 0 -100 -53 -213 -118z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M752 2165l3 -657 543 -314c299 -173 548 -314 553 -314 5 0 9 99 9 230l0 230 -44 28c-23 15 -181 106 -349 202l-306 175 -1 421 0 421 -197 113c-109 62 -201 115 -206 117 -4 2 -6 -291 -5 -652z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M4163 2703l-203 -117 0 -420 -1 -421 -305 -175c-168 -96 -325 -187 -350 -203l-44 -27 0 -230c0 -143 4 -230 10 -230 10 0 1079 615 1093 629 4 4 6 300 5 659l-3 652 -202 -117z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M1452 2168l3 -252 195 -113c107 -62 198 -113 203 -113 4 0 7 110 7 244 0 183 -3 246 -12 253 -7 6 -100 60 -206 121l-192 112 2 -252z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M3465 2301l-200 -116 -3 -248c-1 -136 1 -247 4 -247 14 0 396 224 400 234 2 6 3 120 2 252l-3 240 -200 -115z"
+            android:fillColor="@android:color/white" />
+        <path
+            android:pathData="M2150 936l0 -234 201 -116c110 -64 205 -116 210 -116 5 0 99 52 209 116l200 116 0 234c0 129 -2 234 -5 234 -3 0 -95 -52 -205 -116l-199 -115 -200 115c-110 64 -202 116 -205 116 -3 0 -6 -105 -6 -234z"
+            android:fillColor="@android:color/white" />
+    </group>
+</vector>
