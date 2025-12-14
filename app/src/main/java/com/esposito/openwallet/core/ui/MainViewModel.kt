@@ -12,12 +12,14 @@ import com.esposito.openwallet.core.domain.model.CreditCard
 import com.esposito.openwallet.core.domain.model.CryptoWallet
 import com.esposito.openwallet.core.domain.model.Pass
 import com.esposito.openwallet.core.domain.model.WalletPass
+import com.esposito.openwallet.core.util.SecureLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -56,8 +58,10 @@ private fun WalletPass.toPass() = Pass(
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    walletRepository: WalletRepository
+    private val walletRepository: WalletRepository
 ) : ViewModel() {
+
+    private val TAG = "MainViewModel"
 
     private val _searchQuery = MutableStateFlow("")
     private val _isSearchActive = MutableStateFlow(false)
@@ -123,5 +127,53 @@ class MainViewModel @Inject constructor(
     fun closeSearch() {
         _isSearchActive.value = false
         _searchQuery.value = ""
+    }
+
+    /**
+     * Delete a pass by ID
+     */
+    fun deletePass(passId: String) {
+        viewModelScope.launch {
+            try {
+                SecureLogger.d(TAG, "Deleting pass: $passId")
+                walletRepository.deletePass(passId)
+                SecureLogger.d(TAG, "Pass deleted successfully: $passId")
+            } catch (e: Exception) {
+                SecureLogger.e(TAG, "Failed to delete pass", e)
+                _errorMessage.value = "Failed to delete pass: ${e.message}"
+            }
+        }
+    }
+
+    /**
+     * Delete a credit card by ID
+     */
+    fun deleteCreditCard(creditCardId: String) {
+        viewModelScope.launch {
+            try {
+                SecureLogger.d(TAG, "Deleting credit card: $creditCardId")
+                walletRepository.deleteCreditCard(creditCardId)
+                SecureLogger.d(TAG, "Credit card deleted successfully: $creditCardId")
+            } catch (e: Exception) {
+                SecureLogger.e(TAG, "Failed to delete credit card", e)
+                _errorMessage.value = "Failed to delete credit card: ${e.message}"
+            }
+        }
+    }
+
+    /**
+     * Delete a crypto wallet by ID
+     */
+    fun deleteCryptoWallet(walletId: Long) {
+        viewModelScope.launch {
+            try {
+                SecureLogger.d(TAG, "Deleting crypto wallet: $walletId")
+                walletRepository.deleteCryptoWallet(walletId.toString())
+                SecureLogger.d(TAG, "Crypto wallet deleted successfully: $walletId")
+            } catch (e: Exception) {
+                SecureLogger.e(TAG, "Failed to delete crypto wallet", e)
+                _errorMessage.value = "Failed to delete crypto wallet: ${e.message}"
+            }
+        }
     }
 }

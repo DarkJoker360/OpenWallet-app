@@ -31,12 +31,14 @@ import com.esposito.openwallet.core.ui.components.StandardCardLayout
 fun CryptoWalletCard(
     wallet: CryptoWallet,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null
 ) {
     val cryptoStyle = getCryptoStyleFromWallet(wallet)
     
     BaseCard(
         onClick = onClick,
+        onLongClick = onLongClick,
         modifier = modifier,
         height = 140.dp,
         backgroundBrush = Brush.linearGradient(

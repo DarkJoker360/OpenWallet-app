@@ -88,6 +88,9 @@
     <string name="delete_pass_confirmation">Are you sure you want to delete this pass? This action cannot be undone.</string>
     <string name="pass_deleted">Pass deleted</string>
     <string name="failed_to_delete_pass">Failed to delete pass</string>
+    <string name="delete_confirmation_title">Delete Item</string>
+    <string name="delete_confirmation_message">Are you sure you want to delete this %1$s: %2$s?</string>
+    <string name="pass">pass</string>
     <string name="create_pass">Create Pass</string>
     <string name="pass_created_successfully">Pass created successfully!</string>
     <string name="failed_to_create_pass">Failed to create pass: %1$s</string>

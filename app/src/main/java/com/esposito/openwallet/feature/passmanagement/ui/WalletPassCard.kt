@@ -5,7 +5,9 @@
 
 package com.esposito.openwallet.feature.passmanagement.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -35,6 +37,7 @@ import com.esposito.openwallet.R
 fun WalletPassCard(
     pass: WalletPass,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Use PKPassCard for imported passes, regular card for manual passes
@@ -42,29 +45,33 @@ fun WalletPassCard(
         PKPassCard(
             pass = pass,
             onClick = onClick,
+            onLongClick = onLongClick,
             modifier = modifier
         )
     } else {
         ManualPassCard(
             pass = pass,
             onClick = onClick,
+            onLongClick = onLongClick,
             modifier = modifier
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ManualPassCard(
     pass: WalletPass,
     onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val passColor = PassTypeUtils.getPassTypeColor(pass.type.name)
-    
+
     BaseCard(
         onClick = onClick,
+        onLongClick = onLongClick,
         modifier = modifier,
         height = 200.dp,
         backgroundBrush = if (pass.imageData != null) {

@@ -2,8 +2,9 @@ package com.esposito.openwallet.feature.creditcard.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,12 +53,13 @@ import java.util.Locale
 /**
  * Credit card component with secure display and Material Design 3 styling
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun CreditCardComponent(
     creditCardData: CreditCard,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
     showFlipButton: Boolean = true,
     cardHeight: Dp = 200.dp,
     showSensitiveData: Boolean = false,
@@ -81,7 +83,10 @@ fun CreditCardComponent(
                 ambientColor = Color.Black.copy(alpha = 0.1f),
                 spotColor = Color.Black.copy(alpha = 0.2f)
             )
-            .clickable { onClick() }
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .graphicsLayer {
                 rotationY = cardRotation
                 cameraDistance = 12f * density

@@ -5,12 +5,15 @@
 
 package com.esposito.openwallet.core.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -21,11 +24,12 @@ import androidx.compose.ui.unit.dp
  * Base card component, consolidates common card styling
  * across credit cards, crypto wallets, and passes
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun BaseCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
     height: Dp = 200.dp,
     backgroundBrush: Brush = Brush.linearGradient(
         colors = listOf(
@@ -44,8 +48,7 @@ fun BaseCard(
     contentPadding: Dp = 16.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
-    Card(
-        onClick = onClick,
+    Surface(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
@@ -54,10 +57,14 @@ fun BaseCard(
                 shape = RoundedCornerShape(cornerRadius),
                 ambientColor = Color.Black.copy(alpha = 0.1f),
                 spotColor = Color.Black.copy(alpha = 0.2f)
+            )
+            .clip(RoundedCornerShape(cornerRadius))
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = elevation),
         shape = RoundedCornerShape(cornerRadius),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+        color = Color.Transparent
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background

@@ -152,7 +152,10 @@ class MainActivity : SecureActivity() {
                                 },
                                 onNavigateToSettings = {
                                     navigationHandler.navigateToSettings(this@MainActivity)
-                                }
+                                },
+                                onDeletePass = mainViewModel::deletePass,
+                                onDeleteCreditCard = mainViewModel::deleteCreditCard,
+                                onDeleteCryptoWallet = mainViewModel::deleteCryptoWallet
                             )
                         }
                         

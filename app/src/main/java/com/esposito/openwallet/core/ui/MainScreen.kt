@@ -58,7 +58,10 @@ fun MainScreen(
     onNavigateToPassDetail: (String) -> Unit,
     onNavigateToCreditCardDetail: (String) -> Unit,
     onNavigateToCryptoWalletDetail: (String) -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onDeletePass: (String) -> Unit = {},
+    onDeleteCreditCard: (String) -> Unit = {},
+    onDeleteCryptoWallet: (Long) -> Unit = {}
 ) {
     var showFabMenu by remember { mutableStateOf(false) }
     
@@ -111,7 +114,10 @@ fun MainScreen(
             paddingValues = paddingValues,
             onNavigateToPassDetail = onNavigateToPassDetail,
             onNavigateToCreditCardDetail = onNavigateToCreditCardDetail,
-            onNavigateToCryptoWalletDetail = onNavigateToCryptoWalletDetail
+            onNavigateToCryptoWalletDetail = onNavigateToCryptoWalletDetail,
+            onDeletePass = onDeletePass,
+            onDeleteCreditCard = onDeleteCreditCard,
+            onDeleteCryptoWallet = onDeleteCryptoWallet
         )
     }
 }

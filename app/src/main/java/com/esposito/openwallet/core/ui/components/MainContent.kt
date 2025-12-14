@@ -5,6 +5,8 @@
 
 package com.esposito.openwallet.core.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,9 +17,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +48,9 @@ fun MainContent(
     onNavigateToPassDetail: (String) -> Unit,
     onNavigateToCreditCardDetail: (String) -> Unit,
     onNavigateToCryptoWalletDetail: (String) -> Unit,
+    onDeletePass: (String) -> Unit = {},
+    onDeleteCreditCard: (String) -> Unit = {},
+    onDeleteCryptoWallet: (Long) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -44,10 +58,10 @@ fun MainContent(
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        val hasAnyContent = uiState.filteredPasses.isNotEmpty() || 
-                           uiState.filteredCreditCards.isNotEmpty() || 
+        val hasAnyContent = uiState.filteredPasses.isNotEmpty() ||
+                           uiState.filteredCreditCards.isNotEmpty() ||
                            uiState.filteredCryptoWallets.isNotEmpty()
-        
+
         if (!hasAnyContent) {
             EmptyState(
                 modifier = Modifier.align(Alignment.Center)
@@ -57,20 +71,29 @@ fun MainContent(
                 uiState = uiState,
                 onNavigateToPassDetail = onNavigateToPassDetail,
                 onNavigateToCreditCardDetail = onNavigateToCreditCardDetail,
-                onNavigateToCryptoWalletDetail = onNavigateToCryptoWalletDetail
+                onNavigateToCryptoWalletDetail = onNavigateToCryptoWalletDetail,
+                onDeletePass = onDeletePass,
+                onDeleteCreditCard = onDeleteCreditCard,
+                onDeleteCryptoWallet = onDeleteCryptoWallet
             )
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WalletItemsList(
     uiState: MainUiState,
     onNavigateToPassDetail: (String) -> Unit,
     onNavigateToCreditCardDetail: (String) -> Unit,
     onNavigateToCryptoWalletDetail: (String) -> Unit,
+    onDeletePass: (String) -> Unit,
+    onDeleteCreditCard: (String) -> Unit,
+    onDeleteCryptoWallet: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<DeleteItem?>(null) }
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(
@@ -94,7 +117,11 @@ private fun WalletItemsList(
             ) { wallet ->
                 CryptoWalletCard(
                     wallet = wallet,
-                    onClick = {                 onNavigateToCryptoWalletDetail(wallet.id.toString()) }
+                    onClick = { onNavigateToCryptoWalletDetail(wallet.id.toString()) },
+                    onLongClick = {
+                        itemToDelete = DeleteItem.CryptoWalletItem(wallet.id, wallet.name)
+                        showDeleteDialog = true
+                    }
                 )
             }
             
@@ -116,7 +143,11 @@ private fun WalletItemsList(
             ) { creditCard ->
                 CreditCardItem(
                     creditCard = creditCard,
-                    onNavigateToCreditCardDetail = onNavigateToCreditCardDetail
+                    onNavigateToCreditCardDetail = onNavigateToCreditCardDetail,
+                    onLongClick = {
+                        itemToDelete = DeleteItem.CreditCardItem(creditCard.id, creditCard.cardNickname ?: creditCard.issuerBank)
+                        showDeleteDialog = true
+                    }
                 )
             }
             
@@ -156,13 +187,38 @@ private fun WalletItemsList(
                     updatedAt = pass.updatedAt,
                     passData = "{}"
                 )
-                
+
                 WalletPassCard(
                     pass = walletPass,
-                    onClick = { onNavigateToPassDetail(pass.id) }
+                    onClick = { onNavigateToPassDetail(pass.id) },
+                    onLongClick = {
+                        itemToDelete = DeleteItem.PassItem(pass.id, pass.organizationName)
+                        showDeleteDialog = true
+                    }
                 )
             }
         }
+
+    }
+
+    // Show delete confirmation dialog
+    if (showDeleteDialog && itemToDelete != null) {
+        DeleteConfirmationDialog(
+            item = itemToDelete!!,
+            onConfirm = {
+                when (val item = itemToDelete) {
+                    is DeleteItem.PassItem -> onDeletePass(item.id)
+                    is DeleteItem.CreditCardItem -> onDeleteCreditCard(item.id)
+                    is DeleteItem.CryptoWalletItem -> onDeleteCryptoWallet(item.id)
+                    null -> {}
+                }
+                itemToDelete = null
+            },
+            onDismiss = {
+                showDeleteDialog = false
+                itemToDelete = null
+            }
+        )
     }
 }
 
@@ -188,6 +244,7 @@ private fun SectionSpacer(modifier: Modifier = Modifier) {
 private fun CreditCardItem(
     creditCard: CreditCard,
     onNavigateToCreditCardDetail: (String) -> Unit,
+    onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     CreditCardComponent(
@@ -201,6 +258,54 @@ private fun CreditCardItem(
             iban = null
         ),
         onClick = { onNavigateToCreditCardDetail(creditCard.id) },
+        onLongClick = onLongClick,
         modifier = modifier.fillMaxWidth()
+    )
+}
+
+private sealed class DeleteItem {
+    data class PassItem(val id: String, val title: String) : DeleteItem()
+    data class CreditCardItem(val id: String, val title: String) : DeleteItem()
+    data class CryptoWalletItem(val id: Long, val title: String) : DeleteItem()
+}
+
+@Composable
+private fun DeleteConfirmationDialog(
+    item: DeleteItem,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Default.Delete, contentDescription = null) },
+        title = { Text(stringResource(R.string.delete_confirmation_title)) },
+        text = {
+            val itemType = when (item) {
+                is DeleteItem.PassItem -> stringResource(R.string.pass)
+                is DeleteItem.CreditCardItem -> stringResource(R.string.credit_card)
+                is DeleteItem.CryptoWalletItem -> stringResource(R.string.crypto_wallet)
+            }
+            val itemTitle = when (item) {
+                is DeleteItem.PassItem -> item.title
+                is DeleteItem.CreditCardItem -> item.title
+                is DeleteItem.CryptoWalletItem -> item.title
+            }
+            Text(stringResource(R.string.delete_confirmation_message, itemType, itemTitle))
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm()
+                    onDismiss()
+                }
+            ) {
+                Text(stringResource(R.string.delete))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
     )
 }
