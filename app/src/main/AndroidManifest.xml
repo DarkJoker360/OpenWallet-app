@@ -165,11 +165,33 @@
             android:label="@string/welcome_label"
             android:theme="@style/Theme.OpenWallet" />
 
+        <activity
+            android:name=".feature.quickpass.ui.QuickPassActivity"
+            android:exported="true"
+            android:label="@string/quick_pass_title"
+            android:theme="@style/Theme.OpenWallet.Transparent"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true" />
+
         <service
             android:name=".feature.qs.OpenWalletQSTileService"
             android:exported="true"
             android:icon="@drawable/ic_qs_wallet"
             android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true" />
+        </service>
+
+        <service
+            android:name=".feature.qs.OpenWalletPassesQSTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_qs_wallet"
+            android:label="@string/quick_pass_title"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />

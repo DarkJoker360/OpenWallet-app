@@ -401,5 +401,9 @@
     <string name="pass_category_access">Access &amp; Security</string>
     <string name="pass_category_government">Government &amp; Legal</string>
     <string name="pass_category_generic">Generic</string>
+    <string name="quick_pass_title">Quick Passes</string>
+    <string name="quick_pass_tile_description">Tap to quickly access passes</string>
+    <string name="select_pass_to_view">Select pass to view</string>
+    <string name="open_pass">Open Pass</string>
 
 </resources>
