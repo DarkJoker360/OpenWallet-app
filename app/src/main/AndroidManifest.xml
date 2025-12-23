@@ -83,8 +83,7 @@
             android:exported="false"
             android:label="@string/authentication_label"
             android:theme="@style/Theme.OpenWallet"
-            android:excludeFromRecents="true"
-            android:noHistory="true" />
+            android:excludeFromRecents="true" />
 
         <activity
             android:name=".feature.settings.ui.SettingsActivity"

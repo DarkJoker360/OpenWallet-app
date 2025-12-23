@@ -29,7 +29,7 @@ abstract class SecureActivity : FragmentActivity() {
                 // This will reset the background access flag
                 AuthenticationSessionManager.markAuthenticated()
             }
-            AuthenticationActivity.RESULT_FAILED -> {
+            AuthenticationActivity.RESULT_FAILED, RESULT_CANCELED -> {
                 // Authentication failed or cancelled, close the app
                 finishAffinity()
             }
