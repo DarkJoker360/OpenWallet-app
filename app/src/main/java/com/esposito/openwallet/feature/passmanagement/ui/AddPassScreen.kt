@@ -195,7 +195,7 @@ fun AddPassScreen(
                     subtitle = stringResource(R.string.scan_barcode_description),
                     description = stringResource(R.string.scan_barcode_quick_create),
                     buttonText = stringResource(R.string.open_camera),
-                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    backgroundColor = MaterialTheme.colorScheme.tertiaryFixedDim,
                     iconColor = MaterialTheme.colorScheme.tertiary,
                     onClick = {
                         val intent = BarcodeScanActivity.createIntent(context)
