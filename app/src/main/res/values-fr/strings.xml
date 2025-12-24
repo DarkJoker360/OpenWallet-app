@@ -87,6 +87,9 @@
     <string name="delete_pass_confirmation">Êtes-vous sûr de vouloir supprimer ce pass ? Cette action ne peut pas être annulée.</string>
     <string name="pass_deleted">Pass supprimé</string>
     <string name="failed_to_delete_pass">Échec de la suppression du pass</string>
+    <string name="delete_confirmation_title">Supprimer l\'élément</string>
+    <string name="delete_confirmation_message">Êtes-vous sûr de vouloir supprimer cet %1$s : %2$s ?</string>
+    <string name="pass">pass</string>
     <string name="create_pass">Créer Pass</string>
     <string name="pass_created_successfully">Pass créé avec succès !</string>
     <string name="failed_to_create_pass">Échec de la création du pass : %1$s</string>
@@ -153,6 +156,7 @@
     <string name="reset_onboarding">Réinitialiser Intégration</string>
     <string name="block_screenshots">Bloquer Captures d\'Écran</string>
     <string name="block_screenshots_description">Empêcher captures d\'écran et enregistrement d\'écran dans l\'app</string>
+
     <string name="lock_with_pin_biometrics">Verrouiller avec PIN/Biométrie</string>
     <string name="authentication_failed">Authentification échouée : %1$s</string>
     <string name="biometric_authentication_not_available">Authentification biométrique non disponible</string>
@@ -389,5 +393,14 @@
     <string name="pass_category_access">Accès et Sécurité</string>
     <string name="pass_category_government">Gouvernement et Légal</string>
     <string name="pass_category_generic">Générique</string>
+    <string name="quick_pass_title">Pass Rapides</string>
+    <string name="quick_pass_tile_description">Appuyez pour accéder rapidement aux pass</string>
+    <string name="select_pass_to_view">Sélectionner le pass à voir</string>
+    <string name="open_pass">Ouvrir le Pass</string>
+    <string name="upcoming_pass">Pass à Venir</string>
+    <string name="notification_channel_pass_reminders">Rappels de Pass</string>
+    <string name="notification_channel_pass_reminders_desc">Notifications pour les pass et billets à venir</string>
+    <string name="test_notification">Notification de Test</string>
+    <string name="test_notification_scheduled">Pass de test créé. Notification dans ~10s.</string>
 
 </resources>

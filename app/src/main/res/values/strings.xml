@@ -157,8 +157,7 @@
     <string name="reset_onboarding">Reset Onboarding</string>
     <string name="block_screenshots">Block Screenshots</string>
     <string name="block_screenshots_description">Prevent screenshots and screen recording in the app</string>
-    <string name="close_app_on_background">Close App on Background</string>
-    <string name="close_app_on_background_description">Automatically close the app when it goes to background for enhanced security</string>
+
     <string name="lock_with_pin_biometrics">Lock with PIN/Biometrics</string>
     <string name="authentication_failed">Authentication failed: %1$s</string>
     <string name="biometric_authentication_not_available">Biometric authentication not available</string>

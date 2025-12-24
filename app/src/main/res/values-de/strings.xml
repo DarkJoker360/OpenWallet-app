@@ -87,6 +87,9 @@
     <string name="delete_pass_confirmation">Sind Sie sicher, dass Sie diesen Pass löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="pass_deleted">Pass gelöscht</string>
     <string name="failed_to_delete_pass">Fehler beim Löschen des Passes</string>
+    <string name="delete_confirmation_title">Element löschen</string>
+    <string name="delete_confirmation_message">Sind Sie sicher, dass Sie dieses %1$s löschen möchten: %2$s?</string>
+    <string name="pass">Pass</string>
     <string name="create_pass">Pass erstellen</string>
     <string name="pass_created_successfully">Pass erfolgreich erstellt!</string>
     <string name="failed_to_create_pass">Fehler beim Erstellen des Passes: %1$s</string>
@@ -153,6 +156,7 @@
     <string name="reset_onboarding">Onboarding zurücksetzen</string>
     <string name="block_screenshots">Screenshots blockieren</string>
     <string name="block_screenshots_description">Screenshots und Bildschirmaufnahmen in der App verhindern</string>
+
     <string name="lock_with_pin_biometrics">Mit PIN/Biometrie sperren</string>
     <string name="authentication_failed">Authentifizierung fehlgeschlagen: %1$s</string>
     <string name="biometric_authentication_not_available">Biometrische Authentifizierung nicht verfügbar</string>
@@ -389,5 +393,14 @@
     <string name="pass_category_access">Zugang und Sicherheit</string>
     <string name="pass_category_government">Regierung und Recht</string>
     <string name="pass_category_generic">Generisch</string>
+    <string name="quick_pass_title">Schnell-Pässe</string>
+    <string name="quick_pass_tile_description">Tippen Sie für schnellen Zugriff auf Pässe</string>
+    <string name="select_pass_to_view">Pass zum Anzeigen auswählen</string>
+    <string name="open_pass">Pass öffnen</string>
+    <string name="upcoming_pass">Bevorstehender Pass</string>
+    <string name="notification_channel_pass_reminders">Pass-Erinnerungen</string>
+    <string name="notification_channel_pass_reminders_desc">Benachrichtigungen für bevorstehende Pässe und Tickets</string>
+    <string name="test_notification">Testbenachrichtigung</string>
+    <string name="test_notification_scheduled">Test-Pass erstellt. Benachrichtigung in ~10s.</string>
 
 </resources>
