@@ -63,7 +63,8 @@ object AppContainer {
             _repository ?: WalletRepository(
                 walletPassDao = getDatabase(context).walletPassDao(),
                 creditCardDao = getDatabase(context).creditCardDao(),
-                passManager = getPassManager(context)
+                passManager = getPassManager(context),
+                notificationScheduler = com.esposito.openwallet.core.notification.PassNotificationScheduler(context)
             ).also { _repository = it }
         }
     }

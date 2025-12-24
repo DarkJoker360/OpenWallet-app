@@ -617,4 +617,27 @@ class TestDataManager(
         
         SecureLogger.d(TAG, "Generated ${mockupPasses.size} wallet passes")
     }
+    /**
+     * Generate a pass with relevant date 2 hours and 10 seconds from now
+     * This allows testing the notification scheduler (which triggers 2 hours before)
+     * Notification should appear in ~10 seconds.
+     */
+    suspend fun generateTestNotificationPass() = withContext(Dispatchers.IO) {
+        val now = System.currentTimeMillis()
+        val notificationTime = now + (2 * 60 * 60 * 1000) + (10 * 1000)
+        val pass = WalletPass(
+            id = "test_notification_pass_${Random.nextInt(10000)}",
+            type = PassType.EVENT_TICKET,
+            title = "Test Notification Pass",
+            description = "Notification should appear in 10 seconds",
+            organizationName = "Test Org",
+            relevantDate = java.util.Date(notificationTime),
+            passData = "{}",
+            backgroundColor = "#6750A4",
+            foregroundColor = "#FFFFFF",
+            labelColor = "#FFFFFF"
+        )
+        walletRepository.insertPass(pass)
+        SecureLogger.d(TAG, "Generated test notification pass: ${pass.id}")
+    }
 }

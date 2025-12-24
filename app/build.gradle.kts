@@ -126,6 +126,9 @@ dependencies {
     // Credit Card OCR Scanner (Using bundled ML Kit - NO GMS required!)
     implementation(libs.mlkit.text)
     
+    // WorkManager for background tasks
+    implementation(libs.androidx.work.runtime.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

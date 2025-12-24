@@ -424,6 +424,8 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
     var isClearingData by remember { mutableStateOf(false) }
     var dataStats by remember { mutableStateOf<Map<String, Int>?>(null) }
     
+    var isGeneratingNotification by remember { mutableStateOf(false) }
+
     val testDataManager = remember { 
         TestDataManager(
             walletRepository = AppContainer.getRepository(context)
@@ -436,8 +438,8 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
     }
     
     // Refresh stats after operations
-    LaunchedEffect(isGeneratingData, isClearingData) {
-        if (!isGeneratingData && !isClearingData) {
+    LaunchedEffect(isGeneratingData, isClearingData, isGeneratingNotification) {
+        if (!isGeneratingData && !isClearingData && !isGeneratingNotification) {
             dataStats = testDataManager.getDataStatistics()
         }
     }
@@ -524,7 +526,7 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
                     isGeneratingData = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isGeneratingData && !isClearingData,
+                enabled = !isGeneratingData && !isClearingData && !isGeneratingNotification,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
@@ -543,6 +545,35 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
                     fontWeight = FontWeight.Medium
                 )
             }
+
+            // Test Notification Button
+            OutlinedButton(
+                onClick = {
+                    isGeneratingNotification = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isGeneratingData && !isClearingData && !isGeneratingNotification
+            ) {
+                if (isGeneratingNotification) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Icon(
+                    imageVector = Icons.Default.RemoveRedEye,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.test_notification),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium
+                )
+            }
             
             // Clear All Data Button
             OutlinedButton(
@@ -550,7 +581,7 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
                     isClearingData = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isGeneratingData && !isClearingData
+                enabled = !isGeneratingData && !isClearingData && !isGeneratingNotification
             ) {
                 if (isClearingData) {
                     CircularProgressIndicator(
@@ -580,7 +611,7 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
                     Toast.makeText(context, context.getString(R.string.onboarding_reset_message), Toast.LENGTH_LONG).show()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isGeneratingData && !isClearingData
+                enabled = !isGeneratingData && !isClearingData && !isGeneratingNotification
             ) {
                 Icon(
                     imageVector = Icons.Default.RestartAlt,
@@ -596,13 +627,12 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
             }
         }
     }
-    
-    // Handle data generation in launched effect to avoid composition issues
+
+    // Handle data generation
     LaunchedEffect(isGeneratingData) {
         if (isGeneratingData) {
             try {
                 testDataManager.generateMockupData(activity)
-                dataStats = testDataManager.getDataStatistics()
                 Toast.makeText(
                     context,
                     context.getString(R.string.test_data_generated_successfully),
@@ -620,12 +650,33 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
         }
     }
     
-    // Handle data clearing in launched effect to avoid composition issues
+    // Handle notification test generation
+    LaunchedEffect(isGeneratingNotification) {
+        if (isGeneratingNotification) {
+            try {
+                testDataManager.generateTestNotificationPass()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.test_notification_scheduled),
+                    Toast.LENGTH_LONG
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.error_generating_test_data, e.message ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
+            } finally {
+                isGeneratingNotification = false
+            }
+        }
+    }
+    
+    // Handle data clearing
     LaunchedEffect(isClearingData) {
         if (isClearingData) {
             try {
                 testDataManager.clearAllData()
-                dataStats = testDataManager.getDataStatistics()
                 Toast.makeText(
                     context,
                     context.getString(R.string.all_data_cleared_successfully),

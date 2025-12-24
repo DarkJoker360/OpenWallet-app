@@ -133,11 +133,13 @@ object RepositoryModule {
     fun provideWalletRepository(
         walletPassDao: WalletPassDao,
         creditCardDao: CreditCardDao,
-        passManager: PassManager
+        passManager: PassManager,
+        scheduler: com.esposito.openwallet.core.notification.PassNotificationScheduler
     ): WalletRepository = WalletRepository(
         walletPassDao = walletPassDao,
         creditCardDao = creditCardDao,
-        passManager = passManager
+        passManager = passManager,
+        notificationScheduler = scheduler
     )
 
     @Provides

@@ -16,6 +16,7 @@ import com.esposito.openwallet.core.domain.parser.PassManager
 import com.esposito.openwallet.core.domain.repository.CreditCardRepository
 import com.esposito.openwallet.core.domain.repository.CryptoWalletRepository
 import com.esposito.openwallet.core.domain.repository.WalletPassRepository
+import com.esposito.openwallet.core.notification.PassNotificationScheduler
 import kotlinx.coroutines.flow.Flow
 import java.io.InputStream
 import javax.inject.Inject
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class WalletRepository @Inject constructor(
     private val walletPassDao: WalletPassDao,
     private val creditCardDao: CreditCardDao,
-    private val passManager: PassManager
+    private val passManager: PassManager,
+    private val notificationScheduler: PassNotificationScheduler
 ) : WalletPassRepository, CreditCardRepository, CryptoWalletRepository {
     // WalletPassRepository interface methods
     override fun getAllPasses(): Flow<List<WalletPass>> = walletPassDao.getAllPasses()
@@ -32,14 +34,24 @@ class WalletRepository @Inject constructor(
     
     override suspend fun insertPass(pass: WalletPass): Long {
         walletPassDao.insertPass(pass)
+        notificationScheduler.schedulePassNotification(pass)
         return 0L // DAO doesn't return Long, but interface expects it
     }
     
-    override suspend fun updatePass(pass: WalletPass) = walletPassDao.updatePass(pass)
+    override suspend fun updatePass(pass: WalletPass) {
+        walletPassDao.updatePass(pass)
+        notificationScheduler.schedulePassNotification(pass)
+    }
     
-    override suspend fun deletePass(pass: WalletPass) = walletPassDao.deletePass(pass)
+    override suspend fun deletePass(pass: WalletPass) {
+        walletPassDao.deletePass(pass)
+        notificationScheduler.cancelPassNotification(pass.id)
+    }
     
-    override suspend fun deletePass(id: String) = walletPassDao.deletePassById(id)
+    override suspend fun deletePass(id: String) {
+        walletPassDao.deletePassById(id)
+        notificationScheduler.cancelPassNotification(id)
+    }
     
     override suspend fun getPassesByType(type: String): List<WalletPass> = 
         walletPassDao.getPassesByTypeSync(PassType.valueOf(type.uppercase()))

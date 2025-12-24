@@ -405,5 +405,10 @@
     <string name="quick_pass_tile_description">Tap to quickly access passes</string>
     <string name="select_pass_to_view">Select pass to view</string>
     <string name="open_pass">Open Pass</string>
+    <string name="upcoming_pass">Upcoming Pass</string>
+    <string name="notification_channel_pass_reminders">Pass Reminders</string>
+    <string name="notification_channel_pass_reminders_desc">Notifications for upcoming passes and tickets</string>
+    <string name="test_notification">Test Notification</string>
+    <string name="test_notification_scheduled">Test pass created. Notification in ~10s.</string>
 
 </resources>
