@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.esposito.openwallet.core.domain.model.PassType
 import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.ui.components.BaseCard
 import com.esposito.openwallet.core.ui.components.CategoryChip
@@ -125,11 +126,15 @@ private fun ManualPassCard(
                     )
                 },
                 footer = {
-                    Text(
-                        text = pass.organizationName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
+                    val displayOrg = pass.logoText?.takeIf { it.isNotBlank() } ?: pass.organizationName
+                    if (displayOrg != pass.title && 
+                        !pass.title.contains(displayOrg, ignoreCase = true)) {
+                        Text(
+                            text = displayOrg,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
                     Text(
                         text = pass.title,
                         style = MaterialTheme.typography.headlineSmall,
@@ -139,14 +144,22 @@ private fun ManualPassCard(
                         overflow = TextOverflow.Ellipsis
                     )
                     pass.description?.let { description ->
-                        Text(
-                            text = description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.7f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
+                        val isGenericDescription = description.lowercase().run {
+                            contains("pass") || contains("ticket") || 
+                            equals(pass.title, ignoreCase = true) ||
+                            equals(pass.organizationName, ignoreCase = true) ||
+                            length < 5
+                        }
+                        if (!isGenericDescription) {
+                            Text(
+                                text = description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.7f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
                 }
             )

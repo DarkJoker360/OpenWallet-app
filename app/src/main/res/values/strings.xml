@@ -410,4 +410,21 @@
     <string name="test_notification">Test Notification</string>
     <string name="test_notification_scheduled">Test pass created. Notification in ~10s.</string>
 
+    <!-- Boarding Pass UI -->
+    <string name="from_label">FROM</string>
+    <string name="to_label">TO</string>
+    <string name="passenger_label">PASSENGER</string>
+    <string name="flight_label">FLIGHT</string>
+    <string name="date_label">DATE</string>
+    <string name="departure_time_label">DEPARTURE</string>
+    <string name="gate_closes_label">GATE CLOSES</string>
+    <string name="seat_label">SEAT</string>
+    <string name="door_label">DOOR</string>
+    <string name="queue_label">QUEUE</string>
+    <string name="sequence_label">SEQ</string>
+    <string name="gate_label">GATE</string>
+    <string name="boarding_label">BOARDING</string>
+    <string name="terminal_label">TERMINAL</string>
+    <string name="confirmation_label">CONFIRMATION</string>
+
 </resources>

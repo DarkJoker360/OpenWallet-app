@@ -27,7 +27,29 @@ class PKPassHandler(
         "application/x-apple-pkpass"
     )
     
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
+    private val dateFormats = listOf(
+        // With seconds
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US),    // 2025-01-18T13:00:00+01:00
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US), // 2025-01-18T13:00:00.123+01:00
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US),      // 2025-01-18T13:00:00+0100
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US),  // 2025-01-18T13:00:00.123+0100
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply { 
+            timeZone = TimeZone.getTimeZone("UTC") 
+        },                                                           // 2025-01-18T13:00:00Z
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply { 
+            timeZone = TimeZone.getTimeZone("UTC") 
+        },                                                           // 2025-01-18T13:00:00.123Z
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US),       // 2025-01-18T13:00:00
+        // WITHOUT seconds (Ryanair format!)
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mmXXX", Locale.US),       // 2025-01-18T13:00+01:00
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ", Locale.US),         // 2025-01-18T13:00+0100
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US).apply { 
+            timeZone = TimeZone.getTimeZone("UTC") 
+        },                                                           // 2025-12-26T16:20Z (Ryanair!)
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.US),          // 2025-01-18T13:00
+        // Date only
+        SimpleDateFormat("yyyy-MM-dd", Locale.US)                    // 2025-01-18
+    )
     
     override fun canHandle(fileName: String?, mimeType: String?, inputStream: InputStream): Boolean {
         // Check file extension
@@ -141,11 +163,12 @@ class PKPassHandler(
         val pkPass = gson.fromJson(json, PKPassData::class.java)
         val passType = determinePassType(pkPass)
         val barcodeInfo = pkPass.barcodes?.firstOrNull()
+        val title = generatePassTitle(pkPass, passType)
 
         return WalletPass(
             id = pkPass.serialNumber ?: UUID.randomUUID().toString(),
             type = passType,
-            title = pkPass.description ?: pkPass.organizationName,
+            title = title,
             description = pkPass.description,
             organizationName = pkPass.organizationName,
             logoText = pkPass.logoText,
@@ -183,20 +206,102 @@ class PKPassHandler(
             else -> PassType.GENERIC
         }
     }
+    
+    /**
+     * Generate a meaningful title for the pass based on its type and content
+     */
+    private fun generatePassTitle(pkPass: PKPassData, passType: PassType): String {
+        return when (passType) {
+            PassType.BOARDING_PASS -> {
+                val bp = pkPass.boardingPass
+                val allFields = bp?.headerFields.orEmpty() + 
+                               bp?.primaryFields.orEmpty() + 
+                               bp?.secondaryFields.orEmpty() + 
+                               bp?.auxiliaryFields.orEmpty()
+                
+                val origin = findFieldValue(bp?.primaryFields, "origin", "departure", "from")
+                val destination = findFieldValue(bp?.primaryFields, "destination", "arrival", "to")
+                val flightNumber = findFieldValue(allFields, "flight", "flightNumber", "flightNo")
+                
+                when {
+                    // "FR4238 · BRI → WMI" format
+                    flightNumber != null && origin != null && destination != null -> 
+                        "$flightNumber · $origin → $destination"
+                    // "BRI → WMI" format
+                    origin != null && destination != null -> 
+                        "$origin → $destination"
+                    // "FR4238" format
+                    flightNumber != null -> 
+                        flightNumber
+                    // Fallback to organization name
+                    else -> 
+                        pkPass.organizationName
+                }
+            }
+            PassType.EVENT_TICKET -> {
+                val et = pkPass.eventTicket
+                findFieldValue(et?.primaryFields, "event", "eventName") 
+                    ?: pkPass.description 
+                    ?: pkPass.organizationName
+            }
+            else -> {
+                // For other types, use description or organization name
+                val desc = pkPass.description
+                if (desc != null && !desc.lowercase().contains("pass") && desc.length > 3) {
+                    desc
+                } else {
+                    pkPass.organizationName
+                }
+            }
+        }
+    }
 
     private fun createPassSpecificData(pkPass: PKPassData, passType: PassType): Any {
         return when (passType) {
             PassType.BOARDING_PASS -> {
                 val bp = pkPass.boardingPass
+                
+                // Convert all fields to PassFieldData for flexible display
+                val headerFieldsData = convertFields(bp?.headerFields)
+                val primaryFieldsData = convertFields(bp?.primaryFields)
+                val secondaryFieldsData = convertFields(bp?.secondaryFields)
+                val auxiliaryFieldsData = convertFields(bp?.auxiliaryFields)
+                val backFieldsData = convertFields(bp?.backFields)
+
+                val allFields = bp?.headerFields.orEmpty() + 
+                               bp?.primaryFields.orEmpty() + 
+                               bp?.secondaryFields.orEmpty() + 
+                               bp?.auxiliaryFields.orEmpty() +
+                               bp?.backFields.orEmpty()
+                
                 BoardingPassData(
                     transitType = bp?.transitType ?: "",
-                    gate = getFieldValue(bp?.auxiliaryFields, "gate"),
-                    seat = getFieldValue(bp?.secondaryFields, "seat"),
-                    departureLocation = getFieldValue(bp?.primaryFields, "origin"),
-                    destinationLocation = getFieldValue(bp?.primaryFields, "destination"),
-                    flightNumber = getFieldValue(bp?.primaryFields, "flight"),
-                    departureDate = parseDate(getFieldValue(bp?.headerFields, "departure")),
-                    arrivalDate = parseDate(getFieldValue(bp?.headerFields, "arrival"))
+                    // Primary fields - search for origin/destination
+                    departureLocation = findFieldValue(bp?.primaryFields, "origin", "departure", "from", "departureStation"),
+                    destinationLocation = findFieldValue(bp?.primaryFields, "destination", "arrival", "to", "arrivalStation"),
+                    // Passenger info - can be in auxiliary or secondary fields  
+                    passengerName = findFieldValue(allFields, "passenger", "passengerName", "name", "traveler", "traveller"),
+                    // Flight details
+                    flightNumber = findFieldValue(allFields, "flight", "flightNumber", "flightNo", "trainNumber", "busNumber"),
+                    confirmationCode = findFieldValue(allFields, "recordLocator", "confirmationCode", "confirmation", "booking", "pnr", "bookingRef"),
+                    seat = findFieldValue(allFields, "seat", "seatNumber", "seatNo"),
+                    gate = findFieldValue(allFields, "gate", "gateNumber"),
+                    boardingGroup = findFieldValue(allFields, "boardingGroup", "group", "zone"),
+                    terminal = findFieldValue(allFields, "terminal", "terminalNumber"),
+                    // Times
+                    departureTime = findFieldValue(allFields, "departTime", "departureTime", "departure"),
+                    boardingTime = findFieldValue(allFields, "boardingTime", "boarding"),
+                    gateCloseTime = findFieldValue(allFields, "gateClose", "gateCloseTime"),
+                    // Additional info
+                    boardingDoor = findFieldValue(allFields, "door", "boardingDoor"),
+                    queue = findFieldValue(allFields, "queue", "queueName", "priority"),
+                    sequence = findFieldValue(allFields, "seq", "sequence", "sequenceNumber"),
+                    // Raw fields for flexible display
+                    headerFields = headerFieldsData,
+                    primaryFields = primaryFieldsData,
+                    secondaryFields = secondaryFieldsData,
+                    auxiliaryFields = auxiliaryFieldsData,
+                    backFields = backFieldsData
                 )
             }
             PassType.EVENT_TICKET -> {
@@ -235,11 +340,44 @@ class PKPassHandler(
     private fun getFieldValue(fields: List<PKPassField>?, key: String): String? {
         return fields?.find { it.key == key }?.value?.toString()
     }
+    
+    /**
+     * Search for field value using multiple possible key names
+     */
+    private fun findFieldValue(fields: List<PKPassField>?, vararg possibleKeys: String): String? {
+        if (fields == null) return null
+        for (key in possibleKeys) {
+            val field = fields.find { it.key.equals(key, ignoreCase = true) }
+            if (field != null) {
+                return field.value?.toString()
+            }
+        }
+        return null
+    }
+    
+    /**
+     * Convert PKPass fields to PassFieldData format for storage
+     */
+    private fun convertFields(fields: List<PKPassField>?): List<PassFieldData> {
+        return fields?.map { field ->
+            PassFieldData(
+                key = field.key,
+                label = field.label,
+                value = field.value?.toString() ?: "",
+                dateValue = parseDate(field.value?.toString())
+            )
+        } ?: emptyList()
+    }
 
     private fun parseDate(dateString: String?): Date? {
-        return dateString?.let {
-            dateFormat.parse(it)
+        if (dateString == null) return null
+        for (format in dateFormats) {
+            try {
+                return format.parse(dateString)
+            } catch (e: Exception) {
+            }
         }
+        return null
     }
 
     private fun mapBarcodeFormat(format: String?): BarcodeFormat {

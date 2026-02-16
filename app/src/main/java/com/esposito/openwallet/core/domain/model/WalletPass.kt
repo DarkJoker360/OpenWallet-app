@@ -164,24 +164,48 @@ data class LoyaltyCardData(
 )
 
 data class BoardingPassData(
-    val transitType: String, // Air, Bus, Train, Ferry
-    val gate: String? = null,
-    val seat: String? = null,
-    val boardingGroup: String? = null,
+    val transitType: String, // PKTransitTypeAir, PKTransitTypeBus, PKTransitTypeTrain, PKTransitTypeBoat, PKTransitTypeGeneric
+    // Primary route information (extracted from primaryFields with keys like "origin" and "destination")
     val departureLocation: String? = null,
     val destinationLocation: String? = null,
+    // Passenger info
+    val passengerName: String? = null,
+    // Flight/trip details  
     val flightNumber: String? = null,
     val confirmationCode: String? = null,
-    val departureDate: Date? = null,
-    val arrivalDate: Date? = null,
+    val seat: String? = null,
+    val gate: String? = null,
+    val boardingGroup: String? = null,
+    val terminal: String? = null,
+    // Times
     val departureTime: String? = null,
     val arrivalTime: String? = null,
-    val terminal: String? = null,
-    val boardingTime: Date? = null,
+    val boardingTime: String? = null,
+    val gateCloseTime: String? = null,
+    // Dates
+    val departureDate: Date? = null,
+    val arrivalDate: Date? = null,
+    // Additional values
+    val boardingDoor: String? = null,
+    val queue: String? = null,
+    val sequence: String? = null,
     val aircraft: String? = null,
     val operatingCarrier: String? = null,
     val status: String? = null, // On Time, Delayed, Cancelled, Boarding
-    val securityMessage: String? = null
+    // All raw fields for flexible display (label -> value)
+    val headerFields: List<PassFieldData> = emptyList(),
+    val primaryFields: List<PassFieldData> = emptyList(),
+    val secondaryFields: List<PassFieldData> = emptyList(),
+    val auxiliaryFields: List<PassFieldData> = emptyList(),
+    val backFields: List<PassFieldData> = emptyList()
+)
+
+// Simplified field data for storage
+data class PassFieldData(
+    val key: String,
+    val label: String?,
+    val value: String,
+    val dateValue: Date? = null // For date/time fields
 )
 
 data class EventTicketData(

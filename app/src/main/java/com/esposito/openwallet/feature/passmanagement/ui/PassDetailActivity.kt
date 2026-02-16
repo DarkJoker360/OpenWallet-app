@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.esposito.openwallet.core.di.AppContainer
 import com.esposito.openwallet.core.domain.model.BarcodeFormat
+import com.esposito.openwallet.core.domain.model.PassType
 import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
 import com.esposito.openwallet.core.util.PassTypeUtils
@@ -274,6 +275,79 @@ fun PassDetailContent(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    
+    // Use specialized view for boarding passes
+    if (pass.type == PassType.BOARDING_PASS) {
+        BoardingPassContent(pass = pass, modifier = modifier)
+    } else {
+        GenericPassContent(pass = pass, modifier = modifier, context = context)
+    }
+}
+
+@Composable
+private fun BoardingPassContent(
+    pass: WalletPass,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        // Apple Wallet-style boarding pass card
+        BoardingPassDetailCard(pass = pass)
+        
+        // Usage Instructions
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    modifier = Modifier.size(24.dp)
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Text(
+                    text = stringResource(R.string.present_screen_to_scanner_instruction),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = stringResource(R.string.brightness_set_for_scanning),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+        
+        // Bottom spacing
+        Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@Composable
+private fun GenericPassContent(
+    pass: WalletPass,
+    modifier: Modifier = Modifier,
+    context: Context
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
