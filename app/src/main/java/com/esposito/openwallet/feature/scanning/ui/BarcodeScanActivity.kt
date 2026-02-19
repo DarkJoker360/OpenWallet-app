@@ -76,6 +76,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.esposito.openwallet.core.security.SecureActivity
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
 import com.esposito.openwallet.R
+import com.esposito.openwallet.core.util.BarcodeFormatMapper
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
@@ -514,19 +515,7 @@ class BarcodeAnalyzer(
                         lastScannedTime = currentTime
                         val barcode = barcodes.first()
                         val rawValue = barcode.rawValue
-                        val format = when (barcode.format) {
-                            Barcode.FORMAT_QR_CODE -> "QR_CODE"
-                            Barcode.FORMAT_CODE_128 -> "CODE_128"
-                            Barcode.FORMAT_CODE_39 -> "CODE_39"
-                            Barcode.FORMAT_EAN_13 -> "EAN_13"
-                            Barcode.FORMAT_EAN_8 -> "EAN_8"
-                            Barcode.FORMAT_UPC_A -> "UPC_A"
-                            Barcode.FORMAT_UPC_E -> "UPC_E"
-                            Barcode.FORMAT_PDF417 -> "PDF417"
-                            Barcode.FORMAT_AZTEC -> "AZTEC"
-                            Barcode.FORMAT_DATA_MATRIX -> "DATA_MATRIX"
-                            else -> "UNKNOWN"
-                        }
+                        val format = BarcodeFormatMapper.fromMlKit(barcode.format)
                         rawValue?.let { onBarcodeScanned(it, format) }
                     }
                 }

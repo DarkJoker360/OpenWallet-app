@@ -6,6 +6,7 @@
 package com.esposito.openwallet.core.domain.parser
 
 import com.esposito.openwallet.core.domain.model.*
+import com.esposito.openwallet.core.util.BarcodeFormatMapper
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
@@ -246,7 +247,7 @@ class PKPassHandler(
             passData = gson.toJson(createPassSpecificData(pkPass, passType)),
             barcodeData = barcodeInfo?.message,
             barcodeFormat = if (barcodeInfo?.message != null) {
-                mapBarcodeFormat(barcodeInfo.format)
+                BarcodeFormatMapper.fromPkPassFormat(barcodeInfo.format)
             } else {
                 BarcodeFormat.NONE
             },
@@ -444,15 +445,6 @@ class PKPassHandler(
         return null
     }
 
-    private fun mapBarcodeFormat(format: String?): BarcodeFormat {
-        return when (format?.uppercase()) {
-            "PKBarcodeFormatQR" -> BarcodeFormat.QR
-            "PKBarcodeFormatPDF417" -> BarcodeFormat.PDF417
-            "PKBarcodeFormatAztec" -> BarcodeFormat.AZTEC
-            "PKBarcodeFormatCode128" -> BarcodeFormat.CODE128
-            else -> BarcodeFormat.QR // Default to QR when format is unknown
-        }
-    }
 }
 
 // PKPass JSON structure data classes

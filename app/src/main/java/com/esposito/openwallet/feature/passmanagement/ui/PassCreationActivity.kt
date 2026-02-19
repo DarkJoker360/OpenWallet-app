@@ -7,9 +7,11 @@ package com.esposito.openwallet.feature.passmanagement.ui
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,6 +41,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,13 +52,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Row
 import androidx.lifecycle.lifecycleScope
 import com.esposito.openwallet.core.data.repository.WalletRepository
 import com.esposito.openwallet.core.domain.model.BarcodeFormat
@@ -63,42 +71,13 @@ import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
 import com.esposito.openwallet.core.util.PassTypeUtils
 import com.esposito.openwallet.R
+import com.esposito.openwallet.core.util.BarcodeFormatMapper
+import com.esposito.openwallet.core.util.BarcodeImageDecoder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
-
-/**
- * Convert scanner barcode format to app's BarcodeFormat enum
- */
-private fun mapToBarcodeFormat(scannerFormat: String): BarcodeFormat {
-    return when (scannerFormat) {
-        "QR_CODE" -> BarcodeFormat.QR
-        "CODE_128" -> BarcodeFormat.CODE128
-        "EAN_13" -> BarcodeFormat.EAN13
-        "UPC_A" -> BarcodeFormat.UPC_A
-        "PDF417" -> BarcodeFormat.PDF417
-        "AZTEC" -> BarcodeFormat.AZTEC
-        "DATA_MATRIX" -> BarcodeFormat.DATA_MATRIX
-        // Map other supported formats to the closest equivalent or QR as fallback
-        "CODE_39", "CODE_93", "CODABAR", "EAN_8", "ITF", "UPC_E" -> BarcodeFormat.CODE128
-        else -> BarcodeFormat.QR // Default fallback
-    }
-}
-
-private fun mapToScannerFormat(format: BarcodeFormat): String {
-    return when (format) {
-        BarcodeFormat.QR -> "QR_CODE"
-        BarcodeFormat.CODE128 -> "CODE_128"
-        BarcodeFormat.EAN13 -> "EAN_13"
-        BarcodeFormat.UPC_A -> "UPC_A"
-        BarcodeFormat.PDF417 -> "PDF417"
-        BarcodeFormat.AZTEC -> "AZTEC"
-        BarcodeFormat.DATA_MATRIX -> "DATA_MATRIX"
-        BarcodeFormat.NONE -> "QR_CODE"
-    }
-}
 
 @AndroidEntryPoint
 class PassCreationActivity : ComponentActivity() {
@@ -165,6 +144,64 @@ class PassCreationActivity : ComponentActivity() {
                                 }
                             )
                         }
+                    }
+                }
+            }
+        } else if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
+            // Handle shared image from Android share menu
+            @Suppress("DEPRECATION")
+            val imageUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            if (imageUri != null) {
+                lifecycleScope.launch {
+                    val result = BarcodeImageDecoder.decodeFromUri(this@PassCreationActivity, imageUri)
+                    runOnUiThread {
+                        if (result != null) {
+                            Toast.makeText(this@PassCreationActivity, getString(R.string.barcode_detected), Toast.LENGTH_SHORT).show()
+                            setContent {
+                                OpenWalletTheme {
+                                    PassCreationScreen(
+                                        scannedData = result.data,
+                                        barcodeFormat = result.format,
+                                        onPassCreated = { pass ->
+                                            savePassToDatabase(pass)
+                                        },
+                                        onBackPressed = {
+                                            setResult(RESULT_CANCELED)
+                                            finish()
+                                        }
+                                    )
+                                }
+                            }
+                        } else {
+                            Toast.makeText(this@PassCreationActivity, getString(R.string.no_barcode_found_in_image), Toast.LENGTH_LONG).show()
+                            setContent {
+                                OpenWalletTheme {
+                                    PassCreationScreen(
+                                        onPassCreated = { pass ->
+                                            savePassToDatabase(pass)
+                                        },
+                                        onBackPressed = {
+                                            setResult(RESULT_CANCELED)
+                                            finish()
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                setContent {
+                    OpenWalletTheme {
+                        PassCreationScreen(
+                            onPassCreated = { pass ->
+                                savePassToDatabase(pass)
+                            },
+                            onBackPressed = {
+                                setResult(RESULT_CANCELED)
+                                finish()
+                            }
+                        )
                     }
                 }
             }
@@ -255,7 +292,7 @@ fun PassCreationScreen(
     }
     var selectedBarcodeFormat by remember {
         mutableStateOf(
-            existingPass?.barcodeFormat?.let { mapToScannerFormat(it) }
+            existingPass?.barcodeFormat?.let { BarcodeFormatMapper.toScannerString(it) }
                 ?: barcodeFormat ?: "QR_CODE"
         )
     }
@@ -263,6 +300,27 @@ fun PassCreationScreen(
     var expiryDate by remember { mutableStateOf("") }
     var issuerName by remember { mutableStateOf(existingPass?.organizationName ?: "") }
     var backgroundColor by remember { mutableStateOf(existingPass?.backgroundColor ?: "#1976D2") }
+    var isScanningImage by remember { mutableStateOf(false) }
+    val imageScanScope = rememberCoroutineScope()
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { imageUri ->
+            isScanningImage = true
+            imageScanScope.launch {
+                val result = BarcodeImageDecoder.decodeFromUri(context, imageUri)
+                isScanningImage = false
+                if (result != null) {
+                    barcodeValue = result.data
+                    selectedBarcodeFormat = result.format
+                    Toast.makeText(context, context.getString(R.string.barcode_detected), Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, context.getString(R.string.no_barcode_found_in_image), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -426,6 +484,28 @@ fun PassCreationScreen(
                             }
                         }
                     }
+                    OutlinedButton(
+                        onClick = { imagePickerLauncher.launch("image/*") },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isScanningImage
+                    ) {
+                        if (isScanningImage) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text(stringResource(R.string.scanning_image))
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Image,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text(stringResource(R.string.scan_from_image))
+                        }
+                    }
                 }
             }
 
@@ -477,7 +557,7 @@ fun PassCreationScreen(
                             passData = existingPass?.passData ?: "{}",
                             barcodeData = barcodeValue.trim().takeIf { it.isNotBlank() },
                             barcodeFormat = if (barcodeValue.trim().isNotBlank()) 
-                                mapToBarcodeFormat(selectedBarcodeFormat) 
+                                BarcodeFormatMapper.fromScannerString(selectedBarcodeFormat) 
                                 else null,
                             backgroundColor = backgroundColor,
                             serialNumber = passNumber.trim().takeIf { it.isNotBlank() },

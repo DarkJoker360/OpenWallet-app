@@ -7,6 +7,7 @@ package com.esposito.openwallet.feature.passmanagement.ui
 
 import android.app.Activity
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.GetApp
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -60,7 +62,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.esposito.openwallet.feature.scanning.ui.BarcodeScanActivity
 import com.esposito.openwallet.R
+import com.esposito.openwallet.core.util.BarcodeImageDecoder
 import com.esposito.openwallet.core.util.FileImportHandler
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,6 +111,31 @@ fun AddPassScreen(
                 barcodeFormat = barcodeFormat
             )
             createPassLauncher.launch(intent)
+        }
+    }
+
+    var isScanningImage by remember { mutableStateOf(false) }
+    val imageScanScope = rememberCoroutineScope()
+    val barcodeImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { imageUri ->
+            isScanningImage = true
+            imageScanScope.launch {
+                val result = BarcodeImageDecoder.decodeFromUri(context, imageUri)
+                isScanningImage = false
+                if (result != null) {
+                    Toast.makeText(context, context.getString(R.string.barcode_detected), Toast.LENGTH_SHORT).show()
+                    val intent = PassCreationActivity.createIntent(
+                        context = context,
+                        scannedData = result.data,
+                        barcodeFormat = result.format
+                    )
+                    createPassLauncher.launch(intent)
+                } else {
+                    Toast.makeText(context, context.getString(R.string.no_barcode_found_in_image), Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
     
@@ -216,6 +248,22 @@ fun AddPassScreen(
                     onClick = {
                         val intent = PassCreationActivity.createIntent(context)
                         createPassLauncher.launch(intent)
+                    }
+                )
+            }
+
+            item {
+                AddPassOptionCard(
+                    icon = Icons.Default.Image,
+                    title = stringResource(R.string.scan_barcode_from_image),
+                    subtitle = stringResource(R.string.scan_barcode_image_description),
+                    description = stringResource(R.string.scan_barcode_image_description),
+                    buttonText = if (isScanningImage) stringResource(R.string.scanning_image) else stringResource(R.string.pick_image),
+                    isLoading = isScanningImage,
+                    backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                    iconColor = MaterialTheme.colorScheme.error,
+                    onClick = {
+                        barcodeImageLauncher.launch("image/*")
                     }
                 )
             }

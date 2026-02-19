@@ -95,11 +95,18 @@
 
         <activity
             android:name=".feature.passmanagement.ui.PassCreationActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/create_pass"
             android:theme="@style/Theme.OpenWallet"
             android:parentActivityName=".app.MainActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize">
+            <!-- Receive shared images to scan barcodes from -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".feature.creditcard.ui.AddCreditCardActivity"

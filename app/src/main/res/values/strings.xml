@@ -439,4 +439,14 @@
     <string name="pass_updated_successfully">Pass updated successfully</string>
     <string name="failed_to_update_pass">Failed to update pass</string>
 
+    <!-- Barcode Image Scan -->
+    <string name="scan_from_image">Scan from Image</string>
+    <string name="scanning_image">Scanning image…</string>
+    <string name="no_barcode_found_in_image">No barcode found in the image</string>
+    <string name="failed_to_read_image">Failed to read the image</string>
+    <string name="barcode_detected">Barcode detected!</string>
+    <string name="scan_barcode_from_image">Scan Barcode from Image</string>
+    <string name="scan_barcode_image_description">Pick an image containing a barcode or QR code to extract and import it</string>
+    <string name="pick_image">Pick Image</string>
+
 </resources>
