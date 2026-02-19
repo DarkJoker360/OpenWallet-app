@@ -29,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
@@ -70,6 +71,7 @@ import com.esposito.openwallet.core.util.PassTypeUtils
 import com.esposito.openwallet.R
 import kotlinx.coroutines.launch
 import java.text.DateFormat
+import androidx.activity.result.contract.ActivityResultContracts
 
 class PassDetailActivity : ComponentActivity() {
     
@@ -90,14 +92,23 @@ class PassDetailActivity : ComponentActivity() {
         
         val passId = intent.getStringExtra(EXTRA_PASS_ID) ?: ""
         
-        // Set maximum brightness
+        val editLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                setResult(RESULT_OK)
+                finish()
+            }
+        }
+        
         setMaxBrightness()
         
         setContent {
             OpenWalletTheme {
                 PassDetailScreen(
                     passId = passId,
-                    onNavigateBack = { finish() }
+                    onNavigateBack = { finish() },
+                    onEditPass = { id ->
+                        editLauncher.launch(PassCreationActivity.createEditIntent(this, id))
+                    }
                 )
             }
         }
@@ -134,7 +145,8 @@ class PassDetailActivity : ComponentActivity() {
 @Composable
 fun PassDetailScreen(
     passId: String,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onEditPass: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val repository = AppContainer.getRepository(context)
@@ -178,6 +190,14 @@ fun PassDetailScreen(
                         Icon(
                             Icons.Default.Share,
                             contentDescription = stringResource(R.string.share_pass)
+                        )
+                    }
+                    IconButton(
+                        onClick = { onEditPass(passId) }
+                    ) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.edit_pass)
                         )
                     }
                     IconButton(

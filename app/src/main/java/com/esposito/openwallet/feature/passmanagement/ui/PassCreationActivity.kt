@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.lifecycleScope
 import com.esposito.openwallet.core.data.repository.WalletRepository
+import com.esposito.openwallet.core.domain.model.BarcodeFormat
 import com.esposito.openwallet.core.domain.model.PassType
 import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
@@ -71,18 +72,31 @@ import javax.inject.Inject
 /**
  * Convert scanner barcode format to app's BarcodeFormat enum
  */
-private fun mapToBarcodeFormat(scannerFormat: String): com.esposito.openwallet.core.domain.model.BarcodeFormat {
+private fun mapToBarcodeFormat(scannerFormat: String): BarcodeFormat {
     return when (scannerFormat) {
-        "QR_CODE" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.QR
-        "CODE_128" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.CODE128
-        "EAN_13" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.EAN13
-        "UPC_A" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.UPC_A
-        "PDF417" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.PDF417
-        "AZTEC" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.AZTEC
-        "DATA_MATRIX" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.DATA_MATRIX
-        // Map other supported formats to closest equivalent or QR as fallback
-        "CODE_39", "CODE_93", "CODABAR", "EAN_8", "ITF", "UPC_E" -> com.esposito.openwallet.core.domain.model.BarcodeFormat.CODE128
-        else -> com.esposito.openwallet.core.domain.model.BarcodeFormat.QR // Default fallback
+        "QR_CODE" -> BarcodeFormat.QR
+        "CODE_128" -> BarcodeFormat.CODE128
+        "EAN_13" -> BarcodeFormat.EAN13
+        "UPC_A" -> BarcodeFormat.UPC_A
+        "PDF417" -> BarcodeFormat.PDF417
+        "AZTEC" -> BarcodeFormat.AZTEC
+        "DATA_MATRIX" -> BarcodeFormat.DATA_MATRIX
+        // Map other supported formats to the closest equivalent or QR as fallback
+        "CODE_39", "CODE_93", "CODABAR", "EAN_8", "ITF", "UPC_E" -> BarcodeFormat.CODE128
+        else -> BarcodeFormat.QR // Default fallback
+    }
+}
+
+private fun mapToScannerFormat(format: BarcodeFormat): String {
+    return when (format) {
+        BarcodeFormat.QR -> "QR_CODE"
+        BarcodeFormat.CODE128 -> "CODE_128"
+        BarcodeFormat.EAN13 -> "EAN_13"
+        BarcodeFormat.UPC_A -> "UPC_A"
+        BarcodeFormat.PDF417 -> "PDF417"
+        BarcodeFormat.AZTEC -> "AZTEC"
+        BarcodeFormat.DATA_MATRIX -> "DATA_MATRIX"
+        BarcodeFormat.NONE -> "QR_CODE"
     }
 }
 
@@ -96,6 +110,7 @@ class PassCreationActivity : ComponentActivity() {
         const val EXTRA_PASS_TYPE = "pass_type"
         const val EXTRA_SCANNED_DATA = "scanned_data"
         const val EXTRA_BARCODE_FORMAT = "barcode_format"
+        const val EXTRA_PASS_ID = "edit_pass_id"
         
         fun createIntent(
             context: Context, 
@@ -109,11 +124,18 @@ class PassCreationActivity : ComponentActivity() {
                 barcodeFormat?.let { putExtra(EXTRA_BARCODE_FORMAT, it) }
             }
         }
+
+        fun createEditIntent(context: Context, passId: String): Intent {
+            return Intent(context, PassCreationActivity::class.java).apply {
+                putExtra(EXTRA_PASS_ID, passId)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        val editPassId = intent.getStringExtra(EXTRA_PASS_ID)
         val passTypeName = intent.getStringExtra(EXTRA_PASS_TYPE)
         val initialPassType = passTypeName?.let { 
             try { 
@@ -124,21 +146,44 @@ class PassCreationActivity : ComponentActivity() {
         }
         val scannedData = intent.getStringExtra(EXTRA_SCANNED_DATA)
         val barcodeFormat = intent.getStringExtra(EXTRA_BARCODE_FORMAT)
-        
-        setContent {
-            OpenWalletTheme {
-                PassCreationScreen(
-                    initialPassType = initialPassType,
-                    scannedData = scannedData,
-                    barcodeFormat = barcodeFormat,
-                    onPassCreated = { pass ->
-                        savePassToDatabase(pass)
-                    },
-                    onBackPressed = {
-                        setResult(RESULT_CANCELED)
-                        finish()
+
+        if (editPassId != null) {
+            lifecycleScope.launch {
+                val existingPass = walletRepository.getPassById(editPassId)
+                runOnUiThread {
+                    setContent {
+                        OpenWalletTheme {
+                            PassCreationScreen(
+                                existingPass = existingPass,
+                                initialPassType = existingPass?.type,
+                                onPassCreated = { pass ->
+                                    updatePassInDatabase(pass)
+                                },
+                                onBackPressed = {
+                                    setResult(RESULT_CANCELED)
+                                    finish()
+                                }
+                            )
+                        }
                     }
-                )
+                }
+            }
+        } else {
+            setContent {
+                OpenWalletTheme {
+                    PassCreationScreen(
+                        initialPassType = initialPassType,
+                        scannedData = scannedData,
+                        barcodeFormat = barcodeFormat,
+                        onPassCreated = { pass ->
+                            savePassToDatabase(pass)
+                        },
+                        onBackPressed = {
+                            setResult(RESULT_CANCELED)
+                            finish()
+                        }
+                    )
+                }
             }
         }
     }
@@ -159,11 +204,29 @@ class PassCreationActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun updatePassInDatabase(pass: WalletPass) {
+        lifecycleScope.launch {
+            try {
+                walletRepository.updatePass(pass)
+                runOnUiThread {
+                    Toast.makeText(this@PassCreationActivity, getString(R.string.pass_updated_successfully), Toast.LENGTH_SHORT).show()
+                    setResult(RESULT_OK)
+                    finish()
+                }
+            } catch (_: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this@PassCreationActivity, getString(R.string.failed_to_update_pass), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PassCreationScreen(
+    existingPass: WalletPass? = null,
     initialPassType: PassType? = null,
     scannedData: String? = null,
     barcodeFormat: String? = null,
@@ -172,8 +235,9 @@ fun PassCreationScreen(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val isEditMode = existingPass != null
     
-    var selectedPassType by remember { mutableStateOf(initialPassType ?: PassType.GENERIC) }
+    var selectedPassType by remember { mutableStateOf(existingPass?.type ?: initialPassType ?: PassType.GENERIC) }
     var showPassTypeSelector by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
@@ -184,21 +248,28 @@ fun PassCreationScreen(
     val failedToCreatePass = stringResource(R.string.failed_to_create_pass_generic)
     
     // Form fields
-    var passName by remember { mutableStateOf("") }
-    var passDescription by remember { mutableStateOf("") }
-    var barcodeValue by remember { mutableStateOf(scannedData ?: "") }
-    var selectedBarcodeFormat by remember { mutableStateOf(barcodeFormat ?: "QR_CODE") }
-    var passNumber by remember { mutableStateOf("") }
+    var passName by remember { mutableStateOf(existingPass?.title ?: "") }
+    var passDescription by remember { mutableStateOf(existingPass?.description ?: "") }
+    var barcodeValue by remember {
+        mutableStateOf(existingPass?.barcodeData ?: scannedData ?: "")
+    }
+    var selectedBarcodeFormat by remember {
+        mutableStateOf(
+            existingPass?.barcodeFormat?.let { mapToScannerFormat(it) }
+                ?: barcodeFormat ?: "QR_CODE"
+        )
+    }
+    var passNumber by remember { mutableStateOf(existingPass?.serialNumber ?: "") }
     var expiryDate by remember { mutableStateOf("") }
-    var issuerName by remember { mutableStateOf("") }
-    var backgroundColor by remember { mutableStateOf("#1976D2") }
+    var issuerName by remember { mutableStateOf(existingPass?.organizationName ?: "") }
+    var backgroundColor by remember { mutableStateOf(existingPass?.backgroundColor ?: "#1976D2") }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { 
                     Text(
-                        text = stringResource(R.string.create_new_pass),
+                        text = if (isEditMode) stringResource(R.string.edit_pass) else stringResource(R.string.create_new_pass),
                         fontWeight = FontWeight.SemiBold
                     ) 
                 },
@@ -398,20 +469,30 @@ fun PassCreationScreen(
                     isLoading = true
                     try {
                         val newPass = WalletPass(
-                            id = UUID.randomUUID().toString(),
+                            id = existingPass?.id ?: UUID.randomUUID().toString(),
                             type = selectedPassType,
                             title = passName.trim(),
                             description = passDescription.trim().takeIf { it.isNotBlank() },
                             organizationName = issuerName.trim().takeIf { it.isNotBlank() } ?: "",
-                            passData = "{}",
+                            passData = existingPass?.passData ?: "{}",
                             barcodeData = barcodeValue.trim().takeIf { it.isNotBlank() },
                             barcodeFormat = if (barcodeValue.trim().isNotBlank()) 
                                 mapToBarcodeFormat(selectedBarcodeFormat) 
                                 else null,
                             backgroundColor = backgroundColor,
-                            createdAt = Date(),
+                            serialNumber = passNumber.trim().takeIf { it.isNotBlank() },
+                            foregroundColor = existingPass?.foregroundColor,
+                            labelColor = existingPass?.labelColor,
+                            logoText = existingPass?.logoText,
+                            iconData = existingPass?.iconData,
+                            logoData = existingPass?.logoData,
+                            imageData = existingPass?.imageData,
+                            stripImageData = existingPass?.stripImageData,
+                            thumbnailData = existingPass?.thumbnailData,
+                            filePath = existingPass?.filePath,
+                            createdAt = existingPass?.createdAt ?: Date(),
                             updatedAt = Date(),
-                            isImported = false
+                            isImported = existingPass?.isImported ?: false
                         )
                         onPassCreated(newPass)
                     } catch (e: Exception) {
@@ -432,7 +513,7 @@ fun PassCreationScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text(stringResource(R.string.create_pass))
+                    Text(if (isEditMode) stringResource(R.string.save_changes) else stringResource(R.string.create_pass))
                 }
             }
         }

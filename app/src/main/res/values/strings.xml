@@ -433,4 +433,10 @@
     <string name="share_pass_message">Check out this pass: %1$s from %2$s — Shared via OpenWallet</string>
     <string name="share_pass_failed">Failed to share pass: %1$s</string>
 
+    <!-- Edit Pass -->
+    <string name="edit_pass">Edit Pass</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="pass_updated_successfully">Pass updated successfully</string>
+    <string name="failed_to_update_pass">Failed to update pass</string>
+
 </resources>
