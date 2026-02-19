@@ -402,5 +402,21 @@
     <string name="notification_channel_pass_reminders_desc">Notifications pour les pass et billets à venir</string>
     <string name="test_notification">Notification de Test</string>
     <string name="test_notification_scheduled">Pass de test créé. Notification dans ~10s.</string>
+    <string name="share_pass">Partager Pass</string>
+    <string name="share_pass_title">Partager Pass</string>
+    <string name="share_pass_message">Découvrez ce pass : %1$s de %2$s — Partagé via OpenWallet</string>
+    <string name="share_pass_failed">Échec du partage du pass : %1$s</string>
+    <string name="edit_pass">Modifier Pass</string>
+    <string name="save_changes">Enregistrer les Modifications</string>
+    <string name="pass_updated_successfully">Pass mis à jour avec succès</string>
+    <string name="failed_to_update_pass">Échec de la mise à jour du pass</string>
+    <string name="scan_from_image">Scanner depuis Image</string>
+    <string name="scanning_image">Scan de l\'image…</string>
+    <string name="no_barcode_found_in_image">Aucun code-barres trouvé dans l\'image</string>
+    <string name="failed_to_read_image">Échec de la lecture de l\'image</string>
+    <string name="barcode_detected">Code-barres détecté !</string>
+    <string name="scan_barcode_from_image">Scanner Code-Barres depuis Image</string>
+    <string name="scan_barcode_image_description">Choisissez une image contenant un code-barres ou code QR pour l\'extraire et l\'importer</string>
+    <string name="pick_image">Choisir Image</string>
 
 </resources>
