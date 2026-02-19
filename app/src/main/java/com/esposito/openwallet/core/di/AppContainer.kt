@@ -10,6 +10,7 @@ import com.esposito.openwallet.R
 import com.esposito.openwallet.core.data.local.database.SecureWalletDatabase
 import com.esposito.openwallet.core.data.repository.WalletRepository
 import com.esposito.openwallet.core.domain.parser.GoogleWalletHandler
+import com.esposito.openwallet.core.domain.parser.OpenWalletJsonHandler
 import com.esposito.openwallet.core.domain.parser.PKPassHandler
 import com.esposito.openwallet.core.domain.parser.PassManager
 import com.google.gson.Gson
@@ -48,6 +49,9 @@ object AppContainer {
             
             // Register PKPass handler first (for priority)
             registerHandler(PKPassHandler(gson))
+            
+            // Register OpenWallet JSON handler
+            registerHandler(OpenWalletJsonHandler(gson))
             
             // Register additional format handlers
             registerHandler(GoogleWalletHandler(gson, context))

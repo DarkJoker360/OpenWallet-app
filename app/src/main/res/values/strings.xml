@@ -427,4 +427,10 @@
     <string name="terminal_label">TERMINAL</string>
     <string name="confirmation_label">CONFIRMATION</string>
 
+    <!-- Share Pass -->
+    <string name="share_pass">Share Pass</string>
+    <string name="share_pass_title">Share Pass</string>
+    <string name="share_pass_message">Check out this pass: %1$s from %2$s — Shared via OpenWallet</string>
+    <string name="share_pass_failed">Failed to share pass: %1$s</string>
+
 </resources>

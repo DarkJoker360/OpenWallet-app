@@ -29,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
@@ -64,6 +65,7 @@ import com.esposito.openwallet.core.domain.model.BarcodeFormat
 import com.esposito.openwallet.core.domain.model.PassType
 import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
+import com.esposito.openwallet.core.util.PassExporter
 import com.esposito.openwallet.core.util.PassTypeUtils
 import com.esposito.openwallet.R
 import kotlinx.coroutines.launch
@@ -166,6 +168,18 @@ fun PassDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = {
+                            walletPass?.let { pass ->
+                                PassExporter.sharePass(context, pass)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = stringResource(R.string.share_pass)
+                        )
+                    }
                     IconButton(
                         onClick = { showDeleteDialog = true }
                     ) {

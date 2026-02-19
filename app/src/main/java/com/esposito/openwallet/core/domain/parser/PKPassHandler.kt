@@ -7,6 +7,7 @@ package com.esposito.openwallet.core.domain.parser
 
 import com.esposito.openwallet.core.domain.model.*
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -96,6 +97,7 @@ class PKPassHandler(
         return try {
             val zipInputStream = ZipInputStream(inputStream)
             var passJson: String? = null
+            var openWalletJson: String? = null
             val images = mutableMapOf<String, ByteArray>()
 
             var entry = zipInputStream.nextEntry
@@ -103,6 +105,9 @@ class PKPassHandler(
                 when {
                     entry.name == "pass.json" -> {
                         passJson = zipInputStream.readBytes().toString(Charsets.UTF_8)
+                    }
+                    entry.name == "openwallet.json" -> {
+                        openWalletJson = zipInputStream.readBytes().toString(Charsets.UTF_8)
                     }
                     entry.name.endsWith(".png") -> {
                         images[entry.name] = zipInputStream.readBytes()
@@ -113,7 +118,11 @@ class PKPassHandler(
             }
             zipInputStream.close()
 
-            passJson?.let { json ->
+            val sidecarResult = openWalletJson?.let { sidecar ->
+                restoreFromOpenWalletSidecar(sidecar, images, fileName)
+            }
+
+            sidecarResult ?: passJson?.let { json ->
                 parsePassJson(json, images, fileName)
             }
         } catch (e: Exception) {
@@ -123,6 +132,61 @@ class PKPassHandler(
                 formatName,
                 fileName
             )
+        }
+    }
+
+    private fun restoreFromOpenWalletSidecar(
+        sidecarJson: String,
+        images: Map<String, ByteArray>,
+        fileName: String?
+    ): WalletPass? {
+        return try {
+            val json = gson.fromJson(sidecarJson, JsonObject::class.java) ?: return null
+            val format = json.get("format")?.asString
+            if (format == null || !format.equals("openwallet", ignoreCase = true)) return null
+
+            val passType = try {
+                PassType.valueOf(json.get("type")?.asString ?: "GENERIC")
+            } catch (_: Exception) {
+                PassType.GENERIC
+            }
+
+            val barcodeFormat = try {
+                val fmt = json.get("barcodeFormat")?.asString
+                if (fmt != null) BarcodeFormat.valueOf(fmt) else BarcodeFormat.NONE
+            } catch (_: Exception) {
+                BarcodeFormat.NONE
+            }
+
+            WalletPass(
+                id = json.get("id")?.asString ?: UUID.randomUUID().toString(),
+                type = passType,
+                title = json.get("title")?.asString ?: "Imported Pass",
+                description = json.get("description")?.asString,
+                organizationName = json.get("organizationName")?.asString ?: "Unknown",
+                logoText = json.get("logoText")?.asString,
+                foregroundColor = json.get("foregroundColor")?.asString,
+                backgroundColor = json.get("backgroundColor")?.asString,
+                labelColor = json.get("labelColor")?.asString,
+                serialNumber = json.get("serialNumber")?.asString,
+                relevantDate = parseDate(json.get("relevantDate")?.asString),
+                expirationDate = parseDate(json.get("expirationDate")?.asString),
+                voided = json.get("voided")?.asBoolean ?: false,
+                passData = json.get("passData")?.asString ?: "{}",
+                barcodeData = json.get("barcodeData")?.asString,
+                barcodeFormat = barcodeFormat,
+                imageData = images["background.png"] ?: images["background@2x.png"],
+                iconData = images["icon.png"] ?: images["icon@2x.png"],
+                logoData = images["logo.png"] ?: images["logo@2x.png"],
+                stripImageData = images["strip.png"] ?: images["strip@2x.png"],
+                thumbnailData = images["thumbnail.png"] ?: images["thumbnail@2x.png"],
+                filePath = fileName,
+                isImported = json.get("isImported")?.asBoolean ?: true,
+                createdAt = parseDate(json.get("createdAt")?.asString) ?: Date(),
+                updatedAt = parseDate(json.get("updatedAt")?.asString) ?: Date()
+            )
+        } catch (_: Exception) {
+            null
         }
     }
     
