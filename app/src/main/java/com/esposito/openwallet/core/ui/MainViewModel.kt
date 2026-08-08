@@ -13,6 +13,7 @@ import com.esposito.openwallet.core.domain.model.CryptoWallet
 import com.esposito.openwallet.core.domain.model.Pass
 import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.util.SecureLogger
+import com.google.gson.JsonParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +27,35 @@ import javax.inject.Inject
  * Extension function to convert WalletPass to Pass
  * This handles the mapping between repository and UI models
  */
-private fun WalletPass.toPass() = Pass(
+private fun WalletPass.toPass(): Pass {
+    val data = runCatching { JsonParser.parseString(passData).asJsonObject }.getOrNull()
+
+    fun fields(name: String): List<com.esposito.openwallet.core.domain.model.PassField> =
+        data?.getAsJsonArray(name)?.mapNotNull { element ->
+            element.asJsonObject?.let { field ->
+                val value = field.get("value")?.asString ?: return@let null
+                com.esposito.openwallet.core.domain.model.PassField(
+                    key = field.get("key")?.asString ?: value,
+                    label = field.get("label")?.asString,
+                    value = value
+                )
+            }
+        } ?: emptyList()
+
+    val locations = data?.getAsJsonArray("locations")?.mapNotNull { element ->
+        element.asJsonObject?.let { location ->
+            val latitude = location.get("latitude")?.asDouble ?: return@let null
+            val longitude = location.get("longitude")?.asDouble ?: return@let null
+            com.esposito.openwallet.core.domain.model.Location(
+                latitude = latitude,
+                longitude = longitude,
+                altitude = location.get("altitude")?.asDouble,
+                relevantText = location.get("relevantText")?.asString
+            )
+        }
+    } ?: emptyList()
+
+    return Pass(
     id = this.id,
     organizationName = this.title.takeIf { it.isNotBlank() } ?: this.organizationName,
     description = this.description ?: "",
@@ -35,12 +64,12 @@ private fun WalletPass.toPass() = Pass(
     barcodeMessage = this.barcodeData,
     barcodeFormat = this.barcodeFormat?.name,
     barcodeAltText = null,
-    headerFields = emptyList(), // TODO: understand how to map
-    primaryFields = emptyList(), // TODO: understand how to map
-    secondaryFields = emptyList(), // TODO: understand how to map
-    auxiliaryFields = emptyList(), // TODO: understand how to map
-    backFields = emptyList(), // TODO: understand how to map
-    locations = emptyList(), // TODO: understand how to map
+    headerFields = fields("headerFields"),
+    primaryFields = fields("primaryFields"),
+    secondaryFields = fields("secondaryFields"),
+    auxiliaryFields = fields("auxiliaryFields"),
+    backFields = fields("backFields"),
+    locations = locations,
     relevantDate = this.relevantDate,
     expirationDate = this.expirationDate,
     backgroundColor = this.backgroundColor,
@@ -53,8 +82,11 @@ private fun WalletPass.toPass() = Pass(
     isVoided = this.voided,
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
-    type = this.type.name
-)
+    type = this.type.name,
+    isArchived = this.isArchived,
+    tags = this.tags
+    )
+}
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -176,4 +208,5 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
 }

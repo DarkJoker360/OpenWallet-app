@@ -16,6 +16,7 @@
     <string name="ok">OK</string>
     <string name="error">Erreur</string>
     <string name="search">Rechercher</string>
+    <string name="invalid_crypto_address">Cette adresse n’est pas valide pour la blockchain et le réseau sélectionnés.</string>
     <string name="selection">Sélectionné</string>
     <string name="settings">Paramètres</string>
     <string name="close_search">Fermer la recherche</string>
@@ -400,6 +401,10 @@
     <string name="upcoming_pass">Pass à Venir</string>
     <string name="notification_channel_pass_reminders">Rappels de Pass</string>
     <string name="notification_channel_pass_reminders_desc">Notifications pour les pass et billets à venir</string>
+    <string name="notification_channel_card_expiry">Rappels d’expiration des cartes</string>
+    <string name="notification_channel_card_expiry_desc">Notifications lorsqu’une carte enregistrée est sur le point d’expirer</string>
+    <string name="card_expiry_notification_title">Carte bientôt expirée</string>
+    <string name="card_expiry_notification_text">%1$s %2$s expire %3$s</string>
     <string name="test_notification">Notification de Test</string>
     <string name="test_notification_scheduled">Pass de test créé. Notification dans ~10s.</string>
     <string name="share_pass">Partager Pass</string>
@@ -419,4 +424,24 @@
     <string name="scan_barcode_image_description">Choisissez une image contenant un code-barres ou code QR pour l\'extraire et l\'importer</string>
     <string name="pick_image">Choisir Image</string>
 
+    <string name="backup_and_restore">Sauvegarde et restauration</string>
+    <string name="backup_restore_description">Exportez une sauvegarde chiffrée de toutes vos données ou restaurez-en une.</string>
+    <string name="export_backup">Exporter une sauvegarde chiffrée</string>
+    <string name="restore_backup">Restaurer depuis une sauvegarde</string>
+    <string name="backup_passphrase">Phrase secrète</string>
+    <string name="confirm_passphrase">Confirmer la phrase secrète</string>
+    <string name="backup_passphrase_hint">Chiffre votre sauvegarde. Vous en aurez besoin pour la restaurer ; elle est irrécupérable.</string>
+    <string name="enter_backup_passphrase">Saisissez la phrase secrète de cette sauvegarde</string>
+    <string name="passphrase_too_short">La phrase secrète doit comporter au moins 8 caractères</string>
+    <string name="passphrases_do_not_match">Les phrases secrètes ne correspondent pas</string>
+    <string name="backup_exported_successfully">Sauvegarde chiffrée exportée</string>
+    <string name="backup_restored_summary">%1$d pass, %2$d cartes et %3$d portefeuilles restaurés</string>
+    <string name="backup_failed">Échec de la sauvegarde : %1$s</string>
+    <string name="restore_failed">Échec de la restauration : %1$s</string>
+    <string name="exporting_backup">Exportation…</string>
+    <string name="restoring_backup">Restauration…</string>
+    <string name="auto_lock_timeout">Verrouillage auto</string>
+    <string name="auto_lock_timeout_description">Redemander l\'authentification après inactivité</string>
+    <string name="auto_lock_immediately">Immédiatement</string>
+    <string name="auto_lock_after_minutes">Après %1$d min</string>
 </resources>

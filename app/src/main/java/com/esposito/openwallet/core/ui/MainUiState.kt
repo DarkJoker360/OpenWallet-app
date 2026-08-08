@@ -33,7 +33,10 @@ data class MainUiState(
             passes.filter { pass ->
                 pass.organizationName.contains(searchQuery, ignoreCase = true) ||
                 pass.description.contains(searchQuery, ignoreCase = true) ||
-                pass.serialNumber.contains(searchQuery, ignoreCase = true)
+                pass.serialNumber.contains(searchQuery, ignoreCase = true) ||
+                pass.barcodeMessage?.contains(searchQuery, ignoreCase = true) == true ||
+                pass.tags.any { it.contains(searchQuery, ignoreCase = true) } ||
+                (searchQuery.equals("archived", ignoreCase = true) && pass.isArchived)
             }
         }
     
@@ -48,7 +51,9 @@ data class MainUiState(
                 card.cardHolderName.contains(searchQuery, ignoreCase = true) ||
                 card.issuerBank.contains(searchQuery, ignoreCase = true) ||
                 card.cardType.name.contains(searchQuery, ignoreCase = true) ||
-                card.cardNickname?.contains(searchQuery, ignoreCase = true) == true
+                card.cardNickname?.contains(searchQuery, ignoreCase = true) == true ||
+                card.tags.any { it.contains(searchQuery, ignoreCase = true) } ||
+                (searchQuery.equals("archived", ignoreCase = true) && card.isArchived)
             }
         }
     
@@ -62,7 +67,10 @@ data class MainUiState(
             cryptoWallets.filter { wallet ->
                 wallet.name.contains(searchQuery, ignoreCase = true) ||
                 wallet.symbol.contains(searchQuery, ignoreCase = true) ||
-                wallet.blockchain.contains(searchQuery, ignoreCase = true)
+                wallet.blockchain.contains(searchQuery, ignoreCase = true) ||
+                wallet.address.contains(searchQuery, ignoreCase = true) ||
+                wallet.tags.any { it.contains(searchQuery, ignoreCase = true) } ||
+                (searchQuery.equals("archived", ignoreCase = true) && wallet.isArchived)
             }
         }
 }

@@ -16,6 +16,7 @@
     <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="search">Buscar</string>
+    <string name="invalid_crypto_address">Esta dirección no es válida para la cadena de bloques y la red seleccionadas.</string>
     <string name="selection">Seleccionado</string>
     <string name="settings">Configuración</string>
     <string name="close_search">Cerrar búsqueda</string>
@@ -400,6 +401,10 @@
     <string name="upcoming_pass">Próximo Pase</string>
     <string name="notification_channel_pass_reminders">Recordatorios de Pase</string>
     <string name="notification_channel_pass_reminders_desc">Notificaciones para próximos pases y boletos</string>
+    <string name="notification_channel_card_expiry">Recordatorios de caducidad de tarjetas</string>
+    <string name="notification_channel_card_expiry_desc">Notificaciones cuando una tarjeta guardada está a punto de caducar</string>
+    <string name="card_expiry_notification_title">La tarjeta caduca pronto</string>
+    <string name="card_expiry_notification_text">%1$s %2$s caduca %3$s</string>
     <string name="test_notification">Notificación de Prueba</string>
     <string name="test_notification_scheduled">Pase de prueba creado. Notificación en ~10s.</string>
     <string name="share_pass">Compartir Pase</string>
@@ -419,4 +424,24 @@
     <string name="scan_barcode_image_description">Elige una imagen que contenga un código de barras o código QR para extraerlo e importarlo</string>
     <string name="pick_image">Elegir Imagen</string>
 
+    <string name="backup_and_restore">Copia de seguridad y restauración</string>
+    <string name="backup_restore_description">Exporta una copia de seguridad cifrada de todos tus datos o restaura una.</string>
+    <string name="export_backup">Exportar copia cifrada</string>
+    <string name="restore_backup">Restaurar desde copia</string>
+    <string name="backup_passphrase">Frase de contraseña</string>
+    <string name="confirm_passphrase">Confirmar frase de contraseña</string>
+    <string name="backup_passphrase_hint">Cifra tu copia. La necesitarás para restaurar; no se puede recuperar.</string>
+    <string name="enter_backup_passphrase">Introduce la frase de contraseña de esta copia</string>
+    <string name="passphrase_too_short">La frase debe tener al menos 8 caracteres</string>
+    <string name="passphrases_do_not_match">Las frases no coinciden</string>
+    <string name="backup_exported_successfully">Copia cifrada exportada</string>
+    <string name="backup_restored_summary">Se restauraron %1$d pases, %2$d tarjetas y %3$d monederos</string>
+    <string name="backup_failed">Error en la copia: %1$s</string>
+    <string name="restore_failed">Error al restaurar: %1$s</string>
+    <string name="exporting_backup">Exportando…</string>
+    <string name="restoring_backup">Restaurando…</string>
+    <string name="auto_lock_timeout">Bloqueo automático</string>
+    <string name="auto_lock_timeout_description">Volver a pedir autenticación tras la inactividad</string>
+    <string name="auto_lock_immediately">Inmediatamente</string>
+    <string name="auto_lock_after_minutes">Tras %1$d min</string>
 </resources>

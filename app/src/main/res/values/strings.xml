@@ -17,6 +17,7 @@
     <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="search">Search</string>
+    <string name="invalid_crypto_address">This address is not valid for the selected blockchain and network.</string>
     <string name="selection">Selected</string>
     <string name="settings">Settings</string>
     <string name="close_search">Close search</string>
@@ -187,7 +188,7 @@
     <string name="onboarding_cards_description">Add and organize your credit cards, loyalty cards, and membership cards. Access them instantly when needed.</string>
     <string name="onboarding_cards_feature_1">Credit and debit card storage</string>
     <string name="onboarding_cards_feature_2">Loyalty and membership cards</string>
-    <string name="onboarding_cards_feature_3">Quick access with favorites</string>
+    <string name="onboarding_cards_feature_3">Quick access to your cards</string>
     <string name="crypto_digital_assets">Crypto &amp; Digital Assets</string>
     <string name="onboarding_crypto_description">Store your cryptocurrency wallets and digital assets securely. Track balances and manage multiple blockchains.</string>
     <string name="onboarding_crypto_feature_1">Multi-blockchain support</string>
@@ -407,6 +408,10 @@
     <string name="upcoming_pass">Upcoming Pass</string>
     <string name="notification_channel_pass_reminders">Pass Reminders</string>
     <string name="notification_channel_pass_reminders_desc">Notifications for upcoming passes and tickets</string>
+    <string name="notification_channel_card_expiry">Card Expiry Reminders</string>
+    <string name="notification_channel_card_expiry_desc">Notifications when a saved card is about to expire</string>
+    <string name="card_expiry_notification_title">Card expiring soon</string>
+    <string name="card_expiry_notification_text">%1$s %2$s expires %3$s</string>
     <string name="test_notification">Test Notification</string>
     <string name="test_notification_scheduled">Test pass created. Notification in ~10s.</string>
 
@@ -449,4 +454,24 @@
     <string name="scan_barcode_image_description">Pick an image containing a barcode or QR code to extract and import it</string>
     <string name="pick_image">Pick Image</string>
 
+    <string name="backup_and_restore">Backup &amp; Restore</string>
+    <string name="backup_restore_description">Export an encrypted backup of all your data, or restore one.</string>
+    <string name="export_backup">Export encrypted backup</string>
+    <string name="restore_backup">Restore from backup</string>
+    <string name="backup_passphrase">Backup passphrase</string>
+    <string name="confirm_passphrase">Confirm passphrase</string>
+    <string name="backup_passphrase_hint">Encrypts your backup. You\'ll need it to restore — it can\'t be recovered.</string>
+    <string name="enter_backup_passphrase">Enter the passphrase for this backup</string>
+    <string name="passphrase_too_short">Passphrase must be at least 8 characters</string>
+    <string name="passphrases_do_not_match">Passphrases don\'t match</string>
+    <string name="backup_exported_successfully">Encrypted backup exported</string>
+    <string name="backup_restored_summary">Restored %1$d passes, %2$d cards and %3$d wallets</string>
+    <string name="backup_failed">Backup failed: %1$s</string>
+    <string name="restore_failed">Restore failed: %1$s</string>
+    <string name="exporting_backup">Exporting…</string>
+    <string name="restoring_backup">Restoring…</string>
+    <string name="auto_lock_timeout">Auto-lock</string>
+    <string name="auto_lock_timeout_description">Re-require authentication after the app is idle</string>
+    <string name="auto_lock_immediately">Immediately</string>
+    <string name="auto_lock_after_minutes">After %1$d min</string>
 </resources>

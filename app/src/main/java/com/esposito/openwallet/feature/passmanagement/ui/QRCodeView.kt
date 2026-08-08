@@ -23,6 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.esposito.openwallet.R
 import com.esposito.openwallet.core.domain.model.BarcodeFormat
 import com.google.zxing.BarcodeFormat as ZXingBarcodeFormat
@@ -84,7 +86,13 @@ fun QRCodeView(
     Box(
         modifier = modifier
             .size(size)
-            .background(backgroundColor),
+            .background(backgroundColor)
+            .semantics {
+                contentDescription = context.getString(
+                    R.string.barcode_data_content_description,
+                    data
+                )
+            },
         contentAlignment = Alignment.Center
     ) {
         when {

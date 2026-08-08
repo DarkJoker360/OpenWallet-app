@@ -19,6 +19,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 
 /**
  * Base card component, consolidates common card styling
@@ -59,6 +62,7 @@ fun BaseCard(
                 spotColor = Color.Black.copy(alpha = 0.2f)
             )
             .clip(RoundedCornerShape(cornerRadius))
+            .semantics { role = Role.Button }
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick

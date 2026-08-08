@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.esposito.openwallet.core.domain.model.SupportedBlockchain
+import com.esposito.openwallet.core.domain.model.CryptoAddressValidator
 import com.esposito.openwallet.feature.scanning.ui.BarcodeScanActivity
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
 import com.esposito.openwallet.R
@@ -82,6 +83,11 @@ fun CryptoWalletCreationScreen(
     var selectedNetwork by remember { mutableStateOf("Mainnet") }
     var selectedToken by remember { mutableStateOf<String?>(null) }
     var description by remember { mutableStateOf("") }
+    val addressIsValid = address.isBlank() || CryptoAddressValidator.isValid(
+        address,
+        selectedBlockchain,
+        selectedNetwork
+    )
 
     // Handle UI state changes
     LaunchedEffect(uiState.isWalletCreated) {
@@ -304,7 +310,15 @@ fun CryptoWalletCreationScreen(
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     supportingText = {
-                        Text(stringResource(R.string.address_receive_description, selectedBlockchain.symbol))
+                        Text(
+                            if (addressIsValid) {
+                                stringResource(R.string.address_receive_description, selectedBlockchain.symbol)
+                            } else {
+                                stringResource(R.string.invalid_crypto_address)
+                            },
+                            color = if (addressIsValid) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.error
+                        )
                     }
                 )
                 IconButton(
@@ -351,7 +365,7 @@ fun CryptoWalletCreationScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = !uiState.isLoading && name.isNotBlank() && address.isNotBlank()
+                enabled = !uiState.isLoading && name.isNotBlank() && address.isNotBlank() && addressIsValid
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(

@@ -16,6 +16,7 @@
     <string name="ok">OK</string>
     <string name="error">Fehler</string>
     <string name="search">Suchen</string>
+    <string name="invalid_crypto_address">Diese Adresse ist für die ausgewählte Blockchain und das Netzwerk ungültig.</string>
     <string name="selection">Ausgewählt</string>
     <string name="settings">Einstellungen</string>
     <string name="close_search">Suche schließen</string>
@@ -186,7 +187,7 @@
     <string name="onboarding_cards_description">Fügen Sie Ihre Kreditkarten, Kundenkarten und Mitgliedskarten hinzu und organisieren Sie sie. Greifen Sie sofort darauf zu, wenn Sie sie brauchen.</string>
     <string name="onboarding_cards_feature_1">Kredit- und Debitkarten-Speicherung</string>
     <string name="onboarding_cards_feature_2">Kunden- und Mitgliedskarten</string>
-    <string name="onboarding_cards_feature_3">Schnellzugriff mit Favoriten</string>
+    <string name="onboarding_cards_feature_3">Schnellzugriff auf Ihre Karten</string>
     <string name="crypto_digital_assets">Krypto und digitale Vermögenswerte</string>
     <string name="onboarding_crypto_description">Speichern Sie Ihre Kryptowährungs-Wallets und digitalen Vermögenswerte sicher. Verfolgen Sie Salden und verwalten Sie mehrere Blockchains.</string>
     <string name="onboarding_crypto_feature_1">Multi-Blockchain-Unterstützung</string>
@@ -400,6 +401,10 @@
     <string name="upcoming_pass">Bevorstehender Pass</string>
     <string name="notification_channel_pass_reminders">Pass-Erinnerungen</string>
     <string name="notification_channel_pass_reminders_desc">Benachrichtigungen für bevorstehende Pässe und Tickets</string>
+    <string name="notification_channel_card_expiry">Ablauferinnerungen für Karten</string>
+    <string name="notification_channel_card_expiry_desc">Benachrichtigungen, wenn eine gespeicherte Karte bald abläuft</string>
+    <string name="card_expiry_notification_title">Karte läuft bald ab</string>
+    <string name="card_expiry_notification_text">%1$s %2$s läuft %3$s ab</string>
     <string name="test_notification">Testbenachrichtigung</string>
     <string name="test_notification_scheduled">Test-Pass erstellt. Benachrichtigung in ~10s.</string>
     <string name="share_pass">Pass teilen</string>
@@ -419,4 +424,24 @@
     <string name="scan_barcode_image_description">Wählen Sie ein Bild mit einem Barcode oder QR-Code, um ihn zu extrahieren und zu importieren</string>
     <string name="pick_image">Bild auswählen</string>
 
+    <string name="backup_and_restore">Sichern &amp; Wiederherstellen</string>
+    <string name="backup_restore_description">Exportiere eine verschlüsselte Sicherung aller Daten oder stelle eine wieder her.</string>
+    <string name="export_backup">Verschlüsselte Sicherung exportieren</string>
+    <string name="restore_backup">Aus Sicherung wiederherstellen</string>
+    <string name="backup_passphrase">Sicherungs-Passphrase</string>
+    <string name="confirm_passphrase">Passphrase bestätigen</string>
+    <string name="backup_passphrase_hint">Verschlüsselt deine Sicherung. Du brauchst sie zum Wiederherstellen – sie kann nicht wiederhergestellt werden.</string>
+    <string name="enter_backup_passphrase">Gib die Passphrase für diese Sicherung ein</string>
+    <string name="passphrase_too_short">Die Passphrase muss mindestens 8 Zeichen lang sein</string>
+    <string name="passphrases_do_not_match">Passphrasen stimmen nicht überein</string>
+    <string name="backup_exported_successfully">Verschlüsselte Sicherung exportiert</string>
+    <string name="backup_restored_summary">%1$d Pässe, %2$d Karten und %3$d Wallets wiederhergestellt</string>
+    <string name="backup_failed">Sicherung fehlgeschlagen: %1$s</string>
+    <string name="restore_failed">Wiederherstellung fehlgeschlagen: %1$s</string>
+    <string name="exporting_backup">Wird exportiert…</string>
+    <string name="restoring_backup">Wird wiederhergestellt…</string>
+    <string name="auto_lock_timeout">Automatische Sperre</string>
+    <string name="auto_lock_timeout_description">Nach Inaktivität erneut authentifizieren</string>
+    <string name="auto_lock_immediately">Sofort</string>
+    <string name="auto_lock_after_minutes">Nach %1$d Min.</string>
 </resources>
