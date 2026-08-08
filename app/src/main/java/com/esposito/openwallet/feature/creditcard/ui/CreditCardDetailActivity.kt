@@ -5,11 +5,10 @@
 
 package com.esposito.openwallet.feature.creditcard.ui
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.esposito.openwallet.core.util.SecureClipboard
 import com.esposito.openwallet.core.util.SecureLogger
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
@@ -402,9 +401,7 @@ private fun CreditCardDetailsCard(
     val context = LocalActivity.current as CreditCardDetailActivity
     
     fun copyToClipboard(label: String, text: String) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(label, text)
-        clipboard.setPrimaryClip(clip)
+        SecureClipboard.copySensitive(context, label, text)
         Toast.makeText(context, context.getString(R.string.copied_to_clipboard, label), Toast.LENGTH_SHORT).show()
     }
     

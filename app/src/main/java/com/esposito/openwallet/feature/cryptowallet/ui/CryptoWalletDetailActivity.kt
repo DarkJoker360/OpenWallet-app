@@ -5,8 +5,6 @@
 
 package com.esposito.openwallet.feature.cryptowallet.ui
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -70,6 +68,7 @@ import com.esposito.openwallet.core.domain.model.BarcodeFormat
 import com.esposito.openwallet.core.domain.model.CryptoWallet
 import com.esposito.openwallet.core.security.SecureActivity
 import com.esposito.openwallet.R
+import com.esposito.openwallet.core.util.SecureClipboard
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
 import com.esposito.openwallet.feature.passmanagement.ui.QRCodeView
 import dagger.hilt.android.AndroidEntryPoint
@@ -550,9 +549,7 @@ fun WalletDetailContent(
 
 // Utility functions
 private fun copyToClipboard(context: Context, text: String) {
-    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    val clip = ClipData.newPlainText(context.getString(R.string.crypto_wallet_address), text)
-    clipboard.setPrimaryClip(clip)
+    SecureClipboard.copySensitive(context, context.getString(R.string.crypto_wallet_address), text)
 }
 
 private fun shareWalletAddress(context: Context, wallet: CryptoWallet) {

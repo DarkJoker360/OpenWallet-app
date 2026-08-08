@@ -15,7 +15,8 @@ object AuthenticationSessionManager {
     private var isAuthenticated = false
     private var sessionStartTime = 0L
     private var appWasInBackground = false
-    private const val SESSION_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
+    private const val DEFAULT_SESSION_TIMEOUT_MS = 5 * 60 * 1000L // 5 minutes
+    private const val MILLIS_PER_MINUTE = 60 * 1000L
     
     /**
      * Mark user as authenticated
@@ -29,13 +30,13 @@ object AuthenticationSessionManager {
     /**
      * Check if user is currently authenticated and session is still valid
      */
-    fun isSessionValid(): Boolean {
+    fun isSessionValid(timeoutMs: Long = DEFAULT_SESSION_TIMEOUT_MS): Boolean {
         if (!isAuthenticated) return false
-        
+
         val currentTime = System.currentTimeMillis()
         val sessionAge = currentTime - sessionStartTime
-        
-        return sessionAge < SESSION_TIMEOUT_MS
+
+        return sessionAge < timeoutMs
     }
     
     /**
@@ -56,12 +57,14 @@ object AuthenticationSessionManager {
         if (!appPrefs.isBiometricLockEnabled) {
             return false
         }
-        
+
+        val timeoutMs = appPrefs.autoLockTimeoutMinutes * MILLIS_PER_MINUTE
+
         // Always require authentication if:
         // 1. Never authenticated before, OR
-        // 2. Session expired, OR
+        // 2. Session expired (per the user's auto-lock timeout), OR
         // 3. App was accessed from background/recents
-        return !isAuthenticated || !isSessionValid() || appWasInBackground
+        return !isAuthenticated || !isSessionValid(timeoutMs) || appWasInBackground
     }
     
     /**

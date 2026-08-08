@@ -13,6 +13,7 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
+import java.nio.charset.StandardCharsets
 
 /**
  * Simplified secure storage using Android Keystore
@@ -59,7 +60,7 @@ object SecureStorage {
         cipher.init(Cipher.ENCRYPT_MODE, getOrCreateSecretKey())
 
         val iv = cipher.iv
-        val encryptedData = cipher.doFinal(plaintext.toByteArray())
+        val encryptedData = cipher.doFinal(plaintext.toByteArray(StandardCharsets.UTF_8))
 
         val combined = iv + encryptedData
         return Base64.encodeToString(combined, Base64.DEFAULT)
@@ -70,13 +71,14 @@ object SecureStorage {
      */
     fun decrypt(encryptedData: String): String? {
         val combined = Base64.decode(encryptedData, Base64.DEFAULT)
+        if (combined.size <= GCM_IV_LENGTH) return null
         val iv = combined.sliceArray(0..GCM_IV_LENGTH - 1)
         val cipherText = combined.sliceArray(GCM_IV_LENGTH until combined.size)
         val cipher = Cipher.getInstance(TRANSFORMATION)
         val spec = GCMParameterSpec(128, iv)
         cipher.init(Cipher.DECRYPT_MODE, getOrCreateSecretKey(), spec)
 
-        return String(cipher.doFinal(cipherText))
+        return String(cipher.doFinal(cipherText), StandardCharsets.UTF_8)
     }
     
     /**

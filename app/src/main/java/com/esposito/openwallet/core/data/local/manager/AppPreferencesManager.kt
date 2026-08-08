@@ -35,14 +35,19 @@ class AppPreferencesManager(context: Context) {
         // Security preferences
         private const val KEY_SCREENSHOT_BLOCKING = "screenshot_blocking"
         private const val KEY_BIOMETRIC_LOCK = "biometric_lock"
+        private const val KEY_AUTO_LOCK_TIMEOUT_MINUTES = "auto_lock_timeout_minutes"
 
         private const val KEY_FIRST_LAUNCH = "first_launch"
-        
+
         // Default values
         private const val DEFAULT_ONBOARDING_COMPLETED = false
         private const val DEFAULT_SCREENSHOT_BLOCKING = false
         private const val DEFAULT_BIOMETRIC_LOCK = false
         private const val DEFAULT_FIRST_LAUNCH = true
+        private const val DEFAULT_AUTO_LOCK_TIMEOUT_MINUTES = 5
+
+        /** Selectable auto-lock idle timeouts, in minutes (0 = lock immediately). */
+        val AUTO_LOCK_TIMEOUT_OPTIONS = listOf(0, 1, 5, 15, 30)
     }
     
     private val sharedPrefs: SharedPreferences by lazy {
@@ -90,6 +95,14 @@ class AppPreferencesManager(context: Context) {
     var isBiometricLockEnabled: Boolean
         get() = sharedPrefs.getBoolean(KEY_BIOMETRIC_LOCK, DEFAULT_BIOMETRIC_LOCK)
         set(value) = sharedPrefs.edit { putBoolean(KEY_BIOMETRIC_LOCK, value) }
+
+    /**
+     * Idle time (in minutes) before the app re-requires authentication.
+     * A value of 0 means the app locks immediately.
+     */
+    var autoLockTimeoutMinutes: Int
+        get() = sharedPrefs.getInt(KEY_AUTO_LOCK_TIMEOUT_MINUTES, DEFAULT_AUTO_LOCK_TIMEOUT_MINUTES)
+        set(value) = sharedPrefs.edit { putInt(KEY_AUTO_LOCK_TIMEOUT_MINUTES, value) }
     
     var isFirstLaunch: Boolean
         get() = sharedPrefs.getBoolean(KEY_FIRST_LAUNCH, DEFAULT_FIRST_LAUNCH)
