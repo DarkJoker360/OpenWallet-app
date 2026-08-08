@@ -14,12 +14,12 @@ plugins {
 
 android {
     namespace = "com.esposito.openwallet"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.esposito.openwallet"
         minSdk = 31
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 3
         versionName = "1.2.0"
 
