@@ -38,7 +38,10 @@ data class CreditCard(
     // Encrypted sensitive data (optional)
     val encryptedFullCardNumber: String? = null,
     val encryptedCVV: String? = null,
-    val encryptedIBAN: String? = null
+    val encryptedIBAN: String? = null,
+    val isFavorite: Boolean = false,
+    val isArchived: Boolean = false,
+    val tags: List<String> = emptyList()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

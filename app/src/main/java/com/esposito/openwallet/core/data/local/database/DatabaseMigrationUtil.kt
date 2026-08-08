@@ -10,9 +10,36 @@ import androidx.room.migration.Migration
 /**
  * Database migration utility for OpenWallet
  *
- * Current database version: 1
+ * Current database version: 2
  */
 object DatabaseMigrations {
+
+    val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: androidx.sqlite.db.SupportSQLiteDatabase) {
+            listOf("wallet_passes", "credit_cards", "crypto_wallets").forEach { table ->
+                addColumnIfMissing(database, table, "isFavorite", "INTEGER NOT NULL DEFAULT 0")
+                addColumnIfMissing(database, table, "isArchived", "INTEGER NOT NULL DEFAULT 0")
+                addColumnIfMissing(database, table, "tags", "TEXT NOT NULL DEFAULT '[]'")
+            }
+        }
+
+        private fun addColumnIfMissing(
+            database: androidx.sqlite.db.SupportSQLiteDatabase,
+            table: String,
+            column: String,
+            definition: String
+        ) {
+            val exists = database.query("PRAGMA table_info(`$table`)").use { cursor ->
+                val nameIndex = cursor.getColumnIndex("name")
+                generateSequence {
+                    if (cursor.moveToNext()) cursor.getString(nameIndex) else null
+                }.any { it == column }
+            }
+            if (!exists) {
+                database.execSQL("ALTER TABLE `$table` ADD COLUMN `$column` $definition")
+            }
+        }
+    }
     
     /**
      * Add new migrations here as needed.
@@ -47,8 +74,7 @@ object DatabaseMigrations {
      */
     fun getAllMigrations(): Array<Migration> {
         return arrayOf(
-            // Add migrations here as you create them:
-            // MIGRATION_1_2,
+            MIGRATION_1_2,
         )
     }
 }

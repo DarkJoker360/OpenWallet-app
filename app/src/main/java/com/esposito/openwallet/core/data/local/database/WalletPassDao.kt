@@ -35,7 +35,7 @@ interface WalletPassDao {
     fun getValidPasses(currentTime: Long): Flow<List<WalletPass>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPass(pass: WalletPass)
+    suspend fun insertPass(pass: WalletPass): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPasses(passes: List<WalletPass>)
@@ -57,6 +57,9 @@ interface WalletPassDao {
 
     @Query("UPDATE wallet_passes SET voided = 1 WHERE id = :id")
     suspend fun voidPass(id: String)
+
+    @Query("UPDATE wallet_passes SET isArchived = :archived WHERE id = :id")
+    suspend fun setPassArchived(id: String, archived: Boolean)
 
     // Crypto Wallet methods
     @Query("SELECT * FROM crypto_wallets ORDER BY createdAt DESC")
@@ -88,4 +91,7 @@ interface WalletPassDao {
 
     @Query("SELECT * FROM crypto_wallets WHERE name LIKE '%' || :query || '%' OR address LIKE '%' || :query || '%' OR blockchain LIKE '%' || :query || '%'")
     fun searchCryptoWallets(query: String): Flow<List<CryptoWallet>>
+
+    @Query("UPDATE crypto_wallets SET isArchived = :archived WHERE id = :id")
+    suspend fun setCryptoWalletArchived(id: Long, archived: Boolean)
 }

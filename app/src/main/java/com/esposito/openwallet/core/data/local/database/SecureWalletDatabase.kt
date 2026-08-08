@@ -27,7 +27,7 @@ import javax.crypto.KeyGenerator
 
 @Database(
     entities = [WalletPass::class, CryptoWallet::class, CreditCard::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -95,10 +95,16 @@ abstract class SecureWalletDatabase : RoomDatabase() {
                 }
             } catch (e: GeneralSecurityException) {
                 SecureLogger.e(TAG, "Failed to create encrypted preferences", e)
-                generateFallbackKey()
+                throw IllegalStateException(
+                    "Secure storage is unavailable; refusing to create an unprotected database key",
+                    e
+                )
             } catch (e: Exception) {
                 SecureLogger.e(TAG, "Unexpected error creating database passphrase", e)
-                generateFallbackKey()
+                throw IllegalStateException(
+                    "Secure storage is unavailable; refusing to create an unprotected database key",
+                    e
+                )
             }
         }
         
@@ -114,11 +120,5 @@ abstract class SecureWalletDatabase : RoomDatabase() {
             return keyBytes
         }
         
-        private fun generateFallbackKey(): ByteArray {
-            SecureLogger.w(TAG, "Using fallback key generation - security may be reduced")
-            val keyGen = KeyGenerator.getInstance("AES")
-            keyGen.init(AES_KEY_SIZE)
-            return keyGen.generateKey().encoded
-        }
     }
 }

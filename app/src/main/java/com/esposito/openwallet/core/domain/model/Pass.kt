@@ -38,7 +38,10 @@ data class Pass(
     val isVoided: Boolean = false,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
-    val type: String // String representation of PassType
+    val type: String, // String representation of PassType
+    val isFavorite: Boolean = false,
+    val isArchived: Boolean = false,
+    val tags: List<String> = emptyList()
 )
 
 /**

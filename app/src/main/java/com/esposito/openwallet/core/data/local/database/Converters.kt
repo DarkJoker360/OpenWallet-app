@@ -10,8 +10,19 @@ import com.esposito.openwallet.core.domain.model.BarcodeFormat
 import com.esposito.openwallet.core.domain.model.PassType
 import com.esposito.openwallet.core.domain.model.CreditCardType
 import java.util.Date
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class Converters {
+    private val gson = Gson()
+
+    @TypeConverter
+    fun fromTags(value: List<String>): String = gson.toJson(value)
+
+    @TypeConverter
+    fun toTags(value: String): List<String> = runCatching {
+        gson.fromJson<List<String>>(value, object : TypeToken<List<String>>() {}.type)
+    }.getOrDefault(emptyList())
     
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {

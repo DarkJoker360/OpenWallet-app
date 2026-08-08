@@ -66,4 +66,7 @@ interface CreditCardDao {
     
     @Query("DELETE FROM credit_cards")
     suspend fun deleteAllCreditCards()
+
+    @Query("UPDATE credit_cards SET isArchived = :archived WHERE id = :id")
+    suspend fun setArchived(id: String, archived: Boolean)
 }

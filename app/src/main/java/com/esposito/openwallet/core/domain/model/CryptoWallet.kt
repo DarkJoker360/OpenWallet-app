@@ -21,7 +21,10 @@ data class CryptoWallet(
     val description: String? = null,
     val isActive: Boolean = true,
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis()
+    val updatedAt: Long = System.currentTimeMillis(),
+    val isFavorite: Boolean = false,
+    val isArchived: Boolean = false,
+    val tags: List<String> = emptyList()
 )
 
 enum class SupportedBlockchain(
