@@ -214,6 +214,7 @@ fun AddPassScreen(
                     isLoading = importState is AddPassViewModel.ImportState.Loading,
                     backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     iconColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = { 
                         passFileLauncher.launch("*/*")
                     }
@@ -227,8 +228,9 @@ fun AddPassScreen(
                     subtitle = stringResource(R.string.scan_barcode_description),
                     description = stringResource(R.string.scan_barcode_quick_create),
                     buttonText = stringResource(R.string.open_camera),
-                    backgroundColor = MaterialTheme.colorScheme.tertiaryFixedDim,
+                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
                     iconColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     onClick = {
                         val intent = BarcodeScanActivity.createIntent(context)
                         scanBarcodeLauncher.launch(intent)
@@ -245,6 +247,7 @@ fun AddPassScreen(
                     buttonText = stringResource(R.string.start_creating),
                     backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
                     iconColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     onClick = {
                         val intent = PassCreationActivity.createIntent(context)
                         createPassLauncher.launch(intent)
@@ -262,6 +265,7 @@ fun AddPassScreen(
                     isLoading = isScanningImage,
                     backgroundColor = MaterialTheme.colorScheme.errorContainer,
                     iconColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
                     onClick = {
                         barcodeImageLauncher.launch("image/*")
                     }
@@ -284,13 +288,15 @@ fun AddPassOptionCard(
     buttonText: String,
     backgroundColor: Color,
     iconColor: Color,
+    contentColor: Color,
     isLoading: Boolean = false,
     onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor
+            containerColor = backgroundColor,
+            contentColor = contentColor
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -331,7 +337,7 @@ fun AddPassOptionCard(
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = contentColor.copy(alpha = 0.82f)
                     )
                 }
             }
@@ -341,7 +347,7 @@ fun AddPassOptionCard(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = contentColor.copy(alpha = 0.82f),
                 lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
             )
             
@@ -352,14 +358,15 @@ fun AddPassOptionCard(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = iconColor
+                    containerColor = contentColor,
+                    contentColor = backgroundColor
                 )
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(16.dp),
                         strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = backgroundColor
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
