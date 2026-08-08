@@ -82,7 +82,21 @@ class FileImportHandler @Inject constructor(
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw SecurityException("Unable to access file")
         
-        val fileBytes = inputStream.use { it.readBytes() }
+        val fileBytes = inputStream.use { stream ->
+            val buffer = ByteArray(16 * 1024)
+            val output = java.io.ByteArrayOutputStream()
+            var total = 0
+            while (true) {
+                val count = stream.read(buffer)
+                if (count < 0) break
+                total += count
+                if (total > MAX_FILE_SIZE) {
+                    throw SecurityException("File exceeds the 10 MB import limit")
+                }
+                output.write(buffer, 0, count)
+            }
+            output.toByteArray()
+        }
         
         return Triple(fileName, fileSize, fileBytes)
     }
@@ -92,7 +106,9 @@ class FileImportHandler @Inject constructor(
         when {
             !ALLOWED_EXTENSIONS.contains(extension) -> 
                 throw SecurityException("Invalid file type")
-            fileSize !in MIN_FILE_SIZE..MAX_FILE_SIZE -> 
+            fileSize > MAX_FILE_SIZE ->
+                throw SecurityException("File size validation failed")
+            fileBytes.size !in MIN_FILE_SIZE..MAX_FILE_SIZE ->
                 throw SecurityException("File size validation failed")
             fileBytes.isEmpty() -> 
                 throw SecurityException("Empty file not allowed")
