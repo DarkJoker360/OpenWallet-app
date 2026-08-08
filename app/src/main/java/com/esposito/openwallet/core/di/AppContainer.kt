@@ -17,8 +17,13 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
 /**
- * Simple dependency container
+ * Compatibility container for legacy activities and WorkManager workers.
+ * New components should use Hilt injection from [AppModule].
  */
+@Deprecated(
+    message = "Use Hilt injection for new components; retained for legacy entry points",
+    level = DeprecationLevel.WARNING
+)
 object AppContainer {
     
     private var _database: SecureWalletDatabase? = null
@@ -67,8 +72,10 @@ object AppContainer {
             _repository ?: WalletRepository(
                 walletPassDao = getDatabase(context).walletPassDao(),
                 creditCardDao = getDatabase(context).creditCardDao(),
+                database = getDatabase(context),
                 passManager = getPassManager(context),
-                notificationScheduler = com.esposito.openwallet.core.notification.PassNotificationScheduler(context)
+                notificationScheduler = com.esposito.openwallet.core.notification.PassNotificationScheduler(context),
+                cardExpiryNotificationScheduler = com.esposito.openwallet.core.notification.CardExpiryNotificationScheduler(context)
             ).also { _repository = it }
         }
     }

@@ -73,11 +73,38 @@ import com.esposito.openwallet.core.di.AppContainer
 import com.esposito.openwallet.core.security.SecureActivity
 import com.esposito.openwallet.core.security.SecurityManager
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.esposito.openwallet.core.backup.BackupException
+import com.esposito.openwallet.core.backup.BackupManager
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsActivity : SecureActivity() {
     
     private lateinit var appPrefs: AppPreferencesManager
     private lateinit var securityManager: SecurityManager
+
+    @Inject
+    lateinit var backupManager: BackupManager
     
     companion object {
         fun createIntent(context: Context): Intent {
@@ -97,6 +124,7 @@ class SettingsActivity : SecureActivity() {
                     onBackPressed = { finish() },
                     appPrefs = appPrefs,
                     securityManager = securityManager,
+                    backupManager = backupManager,
                     onScreenshotBlockingChanged = { enabled ->
                         appPrefs.isScreenshotBlockingEnabled = enabled
                         // Apply the change immediately to this activity
@@ -133,15 +161,19 @@ fun SettingsScreen(
     onBackPressed: () -> Unit,
     appPrefs: AppPreferencesManager,
     securityManager: SecurityManager,
+    backupManager: BackupManager,
     onScreenshotBlockingChanged: (Boolean) -> Unit
 ) {
     var isScreenshotBlockingEnabled by remember { 
         mutableStateOf(appPrefs.isScreenshotBlockingEnabled) 
     }
-    var isBiometricLockEnabled by remember { 
-        mutableStateOf(appPrefs.isBiometricLockEnabled) 
+    var isBiometricLockEnabled by remember {
+        mutableStateOf(appPrefs.isBiometricLockEnabled)
     }
-    
+    var autoLockMinutes by remember {
+        mutableStateOf(appPrefs.autoLockTimeoutMinutes)
+    }
+
     // Check biometric availability
     val isBiometricAvailable = securityManager.isBiometricAvailable()
     
@@ -200,9 +232,17 @@ fun SettingsScreen(
                         appPrefs.isBiometricLockEnabled = enabled
                     },
                     isBiometricAvailable = isBiometricAvailable,
-                    hasDeviceLock = hasDeviceLock
+                    hasDeviceLock = hasDeviceLock,
+                    autoLockMinutes = autoLockMinutes,
+                    onAutoLockChanged = { minutes ->
+                        autoLockMinutes = minutes
+                        appPrefs.autoLockTimeoutMinutes = minutes
+                    }
                 )
-                
+
+                // Backup & Restore Section
+                BackupRestoreCard(backupManager)
+
                 // Developer Options Section (only in debug builds)
                 @Suppress("KotlinConstantConditions")
                 if (BuildConfig.ENABLE_DEVELOPER_OPTIONS) {
@@ -222,7 +262,9 @@ private fun SecuritySettingsCard(
     isBiometricLockEnabled: Boolean,
     onBiometricLockChanged: (Boolean) -> Unit,
     isBiometricAvailable: Boolean,
-    hasDeviceLock: Boolean
+    hasDeviceLock: Boolean,
+    autoLockMinutes: Int,
+    onAutoLockChanged: (Int) -> Unit
 ) {
     val context = LocalActivity.current as SettingsActivity
     
@@ -302,9 +344,83 @@ private fun SecuritySettingsCard(
                 },
                 isAvailable = hasDeviceLock
             )
+
+            // Auto-lock timeout (only relevant once app lock is enabled)
+            if (isBiometricLockEnabled) {
+                AutoLockTimeoutRow(
+                    selectedMinutes = autoLockMinutes,
+                    onSelected = onAutoLockChanged
+                )
+            }
         }
     }
 }
+
+@Composable
+private fun AutoLockTimeoutRow(
+    selectedMinutes: Int,
+    onSelected: (Int) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Schedule,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
+            Column {
+                Text(
+                    text = stringResource(R.string.auto_lock_timeout),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = stringResource(R.string.auto_lock_timeout_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
+        }
+        Box {
+            TextButton(onClick = { expanded = true }) {
+                Text(autoLockLabel(selectedMinutes))
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                AppPreferencesManager.AUTO_LOCK_TIMEOUT_OPTIONS.forEach { minutes ->
+                    DropdownMenuItem(
+                        text = { Text(autoLockLabel(minutes)) },
+                        onClick = {
+                            expanded = false
+                            onSelected(minutes)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun autoLockLabel(minutes: Int): String =
+    if (minutes <= 0) {
+        stringResource(R.string.auto_lock_immediately)
+    } else {
+        stringResource(R.string.auto_lock_after_minutes, minutes)
+    }
 
 @Composable
 private fun SecuritySettingRow(
@@ -693,4 +809,271 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
             }
         }
     }
+}
+
+@Composable
+private fun BackupRestoreCard(backupManager: BackupManager) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var isBusy by remember { mutableStateOf(false) }
+    var showExportDialog by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var pendingExportPassphrase by remember { mutableStateOf<String?>(null) }
+    var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Lets the user choose where to write the encrypted backup file.
+    val createDocumentLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument(BackupManager.MIME_TYPE)
+    ) { uri ->
+        val passphrase = pendingExportPassphrase
+        pendingExportPassphrase = null
+        if (uri == null || passphrase == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            isBusy = true
+            try {
+                val bytes = backupManager.exportEncryptedBackup(passphrase)
+                context.contentResolver.openOutputStream(uri)?.use { it.write(bytes) }
+                    ?: throw BackupException(context.getString(R.string.error))
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.backup_exported_successfully),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.backup_failed, e.message ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
+            } finally {
+                isBusy = false
+            }
+        }
+    }
+
+    // Lets the user pick a backup file to restore from.
+    val openDocumentLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            pendingImportUri = uri
+            showImportDialog = true
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Backup,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = stringResource(R.string.backup_and_restore),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Text(
+                text = stringResource(R.string.backup_restore_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+
+            Button(
+                onClick = { showExportDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isBusy,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                if (isBusy) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Icon(
+                    imageVector = Icons.Default.Backup,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.export_backup),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            OutlinedButton(
+                onClick = { openDocumentLauncher.launch(arrayOf("*/*")) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isBusy
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Restore,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.restore_backup),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+
+    if (showExportDialog) {
+        PassphraseDialog(
+            title = stringResource(R.string.export_backup),
+            message = stringResource(R.string.backup_passphrase_hint),
+            requireConfirmation = true,
+            onDismiss = { showExportDialog = false },
+            onConfirm = { passphrase ->
+                showExportDialog = false
+                pendingExportPassphrase = passphrase
+                val timestamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
+                createDocumentLauncher.launch("openwallet-backup-$timestamp.${BackupManager.FILE_EXTENSION}")
+            }
+        )
+    }
+
+    if (showImportDialog) {
+        PassphraseDialog(
+            title = stringResource(R.string.restore_backup),
+            message = stringResource(R.string.enter_backup_passphrase),
+            requireConfirmation = false,
+            onDismiss = {
+                showImportDialog = false
+                pendingImportUri = null
+            },
+            onConfirm = { passphrase ->
+                showImportDialog = false
+                val uri = pendingImportUri
+                pendingImportUri = null
+                if (uri == null) return@PassphraseDialog
+                scope.launch {
+                    isBusy = true
+                    try {
+                        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                            ?: throw BackupException(context.getString(R.string.error))
+                        val summary = backupManager.restoreEncryptedBackup(bytes, passphrase)
+                        Toast.makeText(
+                            context,
+                            context.getString(
+                                R.string.backup_restored_summary,
+                                summary.passes,
+                                summary.creditCards,
+                                summary.cryptoWallets
+                            ),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.restore_failed, e.message ?: ""),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } finally {
+                        isBusy = false
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun PassphraseDialog(
+    title: String,
+    message: String,
+    requireConfirmation: Boolean,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var passphrase by remember { mutableStateOf("") }
+    var confirm by remember { mutableStateOf("") }
+
+    val tooShort = passphrase.length < 8
+    val mismatch = requireConfirmation && passphrase != confirm
+    val errorMessage = when {
+        passphrase.isEmpty() -> null
+        tooShort -> stringResource(R.string.passphrase_too_short)
+        mismatch -> stringResource(R.string.passphrases_do_not_match)
+        else -> null
+    }
+    val canConfirm = passphrase.isNotEmpty() && !tooShort && !mismatch
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(text = message, style = MaterialTheme.typography.bodyMedium)
+                OutlinedTextField(
+                    value = passphrase,
+                    onValueChange = { passphrase = it },
+                    label = { Text(stringResource(R.string.backup_passphrase)) },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (requireConfirmation) {
+                    OutlinedTextField(
+                        value = confirm,
+                        onValueChange = { confirm = it },
+                        label = { Text(stringResource(R.string.confirm_passphrase)) },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(passphrase) }, enabled = canConfirm) {
+                Text(stringResource(R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }

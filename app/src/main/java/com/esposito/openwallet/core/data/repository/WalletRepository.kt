@@ -6,6 +6,7 @@
 package com.esposito.openwallet.core.data.repository
 
 import com.esposito.openwallet.core.data.local.dao.CreditCardDao
+import com.esposito.openwallet.core.data.local.database.SecureWalletDatabase
 import com.esposito.openwallet.core.data.local.database.WalletPassDao
 import com.esposito.openwallet.core.domain.model.CreditCard
 import com.esposito.openwallet.core.domain.model.CryptoWallet
@@ -16,16 +17,20 @@ import com.esposito.openwallet.core.domain.parser.PassManager
 import com.esposito.openwallet.core.domain.repository.CreditCardRepository
 import com.esposito.openwallet.core.domain.repository.CryptoWalletRepository
 import com.esposito.openwallet.core.domain.repository.WalletPassRepository
+import com.esposito.openwallet.core.notification.CardExpiryNotificationScheduler
 import com.esposito.openwallet.core.notification.PassNotificationScheduler
 import kotlinx.coroutines.flow.Flow
+import androidx.room.withTransaction
 import java.io.InputStream
 import javax.inject.Inject
 
 class WalletRepository @Inject constructor(
     private val walletPassDao: WalletPassDao,
     private val creditCardDao: CreditCardDao,
+    private val database: SecureWalletDatabase,
     private val passManager: PassManager,
-    private val notificationScheduler: PassNotificationScheduler
+    private val notificationScheduler: PassNotificationScheduler,
+    private val cardExpiryNotificationScheduler: CardExpiryNotificationScheduler
 ) : WalletPassRepository, CreditCardRepository, CryptoWalletRepository {
     // WalletPassRepository interface methods
     override fun getAllPasses(): Flow<List<WalletPass>> = walletPassDao.getAllPasses()
@@ -33,9 +38,9 @@ class WalletRepository @Inject constructor(
     override suspend fun getPass(id: String): WalletPass? = walletPassDao.getPassById(id)
     
     override suspend fun insertPass(pass: WalletPass): Long {
-        walletPassDao.insertPass(pass)
+        val rowId = walletPassDao.insertPass(pass)
         notificationScheduler.schedulePassNotification(pass)
-        return 0L // DAO doesn't return Long, but interface expects it
+        return rowId
     }
     
     override suspend fun updatePass(pass: WalletPass) {
@@ -106,7 +111,8 @@ class WalletRepository @Inject constructor(
     // CryptoWalletRepository interface methods  
     override fun getAllCryptoWallets(): Flow<List<CryptoWallet>> = walletPassDao.getAllCryptoWallets()
 
-    override suspend fun getCryptoWallet(id: String): CryptoWallet? = walletPassDao.getCryptoWalletById(id.toLongOrNull() ?: 0)
+    override suspend fun getCryptoWallet(id: String): CryptoWallet? =
+        id.toLongOrNull()?.let { walletPassDao.getCryptoWalletById(it) }
 
     override suspend fun insertCryptoWallet(wallet: CryptoWallet): Long = walletPassDao.insertCryptoWallet(wallet)
 
@@ -114,14 +120,29 @@ class WalletRepository @Inject constructor(
 
     override suspend fun deleteCryptoWallet(wallet: CryptoWallet) = walletPassDao.deleteCryptoWallet(wallet)
 
-    override suspend fun deleteCryptoWallet(id: String) = 
-        walletPassDao.getCryptoWalletById(id.toLongOrNull() ?: 0)?.let { 
+    override suspend fun deleteCryptoWallet(id: String) =
+        id.toLongOrNull()?.let { walletPassDao.getCryptoWalletById(it) }?.let {
             walletPassDao.deleteCryptoWallet(it) 
         } ?: Unit
 
     // Additional Crypto Wallet methods
 
     suspend fun getAllCryptoWalletsSync(): List<CryptoWallet> = walletPassDao.getAllCryptoWalletsSync()
+
+    suspend fun restoreBackup(
+        passes: List<WalletPass>,
+        creditCards: List<CreditCard>,
+        cryptoWallets: List<CryptoWallet>
+    ) {
+        database.withTransaction {
+            walletPassDao.insertPasses(passes)
+            creditCardDao.insertCreditCards(creditCards)
+            cryptoWallets.forEach { walletPassDao.insertCryptoWallet(it) }
+        }
+
+        passes.forEach { notificationScheduler.schedulePassNotification(it) }
+        creditCards.forEach { cardExpiryNotificationScheduler.scheduleCardExpiryNotification(it) }
+    }
 
     suspend fun getCryptoWalletById(id: Long): CryptoWallet? = walletPassDao.getCryptoWalletById(id)
 
@@ -131,20 +152,37 @@ class WalletRepository @Inject constructor(
     override fun getAllCreditCards(): Flow<List<CreditCard>> = creditCardDao.getAllCreditCards()
     
     override suspend fun getCreditCard(id: String): CreditCard? = creditCardDao.getCreditCardById(id)
-    
-    override suspend fun insertCreditCard(creditCard: CreditCard): Long = creditCardDao.insertCreditCard(creditCard)
-    
-    override suspend fun updateCreditCard(creditCard: CreditCard) = creditCardDao.updateCreditCard(creditCard)
-    
-    override suspend fun deleteCreditCard(creditCard: CreditCard) = creditCardDao.deleteCreditCard(creditCard)
-    
-    override suspend fun deleteCreditCard(id: String) = creditCardDao.deleteCreditCardById(id)
+
+    override suspend fun insertCreditCard(creditCard: CreditCard): Long {
+        val rowId = creditCardDao.insertCreditCard(creditCard)
+        cardExpiryNotificationScheduler.scheduleCardExpiryNotification(creditCard)
+        return rowId
+    }
+
+    override suspend fun updateCreditCard(creditCard: CreditCard) {
+        creditCardDao.updateCreditCard(creditCard)
+        cardExpiryNotificationScheduler.scheduleCardExpiryNotification(creditCard)
+    }
+
+    override suspend fun deleteCreditCard(creditCard: CreditCard) {
+        creditCardDao.deleteCreditCard(creditCard)
+        cardExpiryNotificationScheduler.cancelCardExpiryNotification(creditCard.id)
+    }
+
+    override suspend fun deleteCreditCard(id: String) {
+        creditCardDao.deleteCreditCardById(id)
+        cardExpiryNotificationScheduler.cancelCardExpiryNotification(id)
+    }
 
     // Additional Credit Card methods
 
     suspend fun getAllCreditCardsSync(): List<CreditCard> = creditCardDao.getAllCreditCardsSync()
 
     suspend fun deleteAllCreditCards() = creditCardDao.deleteAllCreditCards()
+
+    suspend fun setPassArchived(id: String, archived: Boolean) = walletPassDao.setPassArchived(id, archived)
+    suspend fun setCreditCardArchived(id: String, archived: Boolean) = creditCardDao.setArchived(id, archived)
+    suspend fun setCryptoWalletArchived(id: Long, archived: Boolean) = walletPassDao.setCryptoWalletArchived(id, archived)
 }
 
 /**
