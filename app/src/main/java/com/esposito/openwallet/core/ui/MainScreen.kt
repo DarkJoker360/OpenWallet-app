@@ -5,6 +5,7 @@
 
 package com.esposito.openwallet.core.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -72,6 +73,10 @@ fun MainScreen(
         if (!uiState.isSearchActive) {
             hideKeyboard?.hide()
         }
+    }
+
+    BackHandler(enabled = uiState.isSearchActive) {
+        onCloseSearch()
     }
 
     Scaffold(
