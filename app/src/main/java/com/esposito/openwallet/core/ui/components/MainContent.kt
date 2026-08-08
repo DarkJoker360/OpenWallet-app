@@ -10,11 +10,11 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -32,8 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.esposito.openwallet.R
 import com.esposito.openwallet.core.domain.model.CreditCard
@@ -76,8 +76,8 @@ fun MainContent(
                 onNavigateToCryptoWalletDetail = onNavigateToCryptoWalletDetail,
                 onDeletePass = onDeletePass,
                 onDeleteCreditCard = onDeleteCreditCard,
-                onDeleteCryptoWallet = onDeleteCryptoWallet
-                ,onNavigateToArchived = onNavigateToArchived
+                onDeleteCryptoWallet = onDeleteCryptoWallet,
+                onNavigateToArchived = onNavigateToArchived
             )
         }
     }
@@ -100,77 +100,50 @@ private fun WalletItemsList(
     var itemToDelete by remember { mutableStateOf<DeleteItem?>(null) }
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 16.dp, 
-            end = 16.dp, 
-            top = 8.dp, 
-            bottom = 80.dp
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 96.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Crypto Wallets Section
         if (uiState.filteredCryptoWallets.isNotEmpty()) {
-            item {
-                SectionHeader(title = stringResource(R.string.crypto_wallets))
-            }
-            
-            items(
-                items = uiState.filteredCryptoWallets,
-                key = { wallet -> wallet.id },
-                contentType = { "crypto_wallet" }
-            ) { wallet ->
-                CryptoWalletCard(
-                    wallet = wallet,
-                    onClick = { onNavigateToCryptoWalletDetail(wallet.id.toString()) },
-                    onLongClick = {
-                        itemToDelete = DeleteItem.CryptoWalletItem(wallet.id, wallet.name)
-                        showDeleteDialog = true
-                    }
-                )
-            }
-            
-            if (uiState.filteredCreditCards.isNotEmpty() || uiState.filteredPasses.isNotEmpty()) {
-                item { SectionSpacer() }
-            }
+            item { SectionHeader(stringResource(R.string.crypto_wallets)) }
         }
-        
-        // Credit Cards Section
+        items(uiState.filteredCryptoWallets, key = { it.id }, contentType = { "crypto_wallet" }) { wallet ->
+            CryptoWalletCard(
+                wallet = wallet,
+                onClick = { onNavigateToCryptoWalletDetail(wallet.id.toString()) },
+                onLongClick = {
+                    itemToDelete = DeleteItem.CryptoWalletItem(wallet.id, wallet.name)
+                    showDeleteDialog = true
+                }
+            )
+        }
+
+        if (uiState.filteredCryptoWallets.isNotEmpty() &&
+            (uiState.filteredCreditCards.isNotEmpty() || uiState.filteredPasses.isNotEmpty())) {
+            item { SectionSpacer() }
+        }
+
         if (uiState.filteredCreditCards.isNotEmpty()) {
-            item {
-                SectionHeader(title = stringResource(R.string.credit_cards))
-            }
-            
-            items(
-                items = uiState.filteredCreditCards,
-                key = { creditCard -> creditCard.id },
-                contentType = { "credit_card" }
-            ) { creditCard ->
-                CreditCardItem(
-                    creditCard = creditCard,
-                    onNavigateToCreditCardDetail = onNavigateToCreditCardDetail,
-                    onLongClick = {
-                        itemToDelete = DeleteItem.CreditCardItem(creditCard.id, creditCard.cardNickname ?: creditCard.issuerBank)
-                        showDeleteDialog = true
-                    }
-                )
-            }
-            
-            if (uiState.filteredPasses.isNotEmpty()) {
-                item { SectionSpacer() }
-            }
+            item { SectionHeader(stringResource(R.string.credit_cards)) }
         }
-        
-        // Passes & Cards Section
+        items(uiState.filteredCreditCards, key = { it.id }, contentType = { "credit_card" }) { creditCard ->
+            CreditCardItem(
+                creditCard = creditCard,
+                onNavigateToCreditCardDetail = onNavigateToCreditCardDetail,
+                onLongClick = {
+                    itemToDelete = DeleteItem.CreditCardItem(creditCard.id, creditCard.cardNickname ?: creditCard.issuerBank)
+                    showDeleteDialog = true
+                }
+            )
+        }
+
+        if (uiState.filteredCreditCards.isNotEmpty() && uiState.filteredPasses.isNotEmpty()) {
+            item { SectionSpacer() }
+        }
+
         if (uiState.filteredPasses.isNotEmpty()) {
-            item {
-                SectionHeader(title = stringResource(R.string.passes_and_cards))
-            }
-            
-            items(
-                items = uiState.filteredPasses,
-                key = { pass -> pass.id },
-                contentType = { pass -> "pass_${pass.type}" }
-            ) { pass ->
+            item { SectionHeader(stringResource(R.string.passes_and_cards)) }
+        }
+        items(uiState.filteredPasses, key = { it.id }, contentType = { pass -> "pass_${pass.type}" }) { pass ->
                 // Convert Pass back to WalletPass for the component
                 val walletPass = com.esposito.openwallet.core.domain.model.WalletPass(
                     id = pass.id,
@@ -200,7 +173,6 @@ private fun WalletItemsList(
                         showDeleteDialog = true
                     }
                 )
-            }
         }
 
         if (!uiState.showArchived && uiState.hasArchivedItems) {
@@ -210,15 +182,10 @@ private fun WalletItemsList(
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
                 TextButton(
+                    modifier = Modifier.fillMaxWidth(),
                     onClick = onNavigateToArchived,
-                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        stringResource(
-                            if (uiState.showArchived) R.string.hide_archived_items
-                            else R.string.show_archived_items
-                        )
-                    )
+                    Text(stringResource(R.string.show_archived_items))
                 }
             }
         }
@@ -247,21 +214,18 @@ private fun WalletItemsList(
 }
 
 @Composable
-private fun SectionHeader(
-    title: String,
-    modifier: Modifier = Modifier
-) {
+private fun SectionHeader(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
-        modifier = modifier.padding(bottom = 4.dp)
+        modifier = Modifier.padding(bottom = 4.dp)
     )
 }
 
 @Composable
-private fun SectionSpacer(modifier: Modifier = Modifier) {
-    Spacer(modifier = modifier.height(16.dp))
+private fun SectionSpacer() {
+    Spacer(modifier = Modifier.height(12.dp))
 }
 
 @Composable

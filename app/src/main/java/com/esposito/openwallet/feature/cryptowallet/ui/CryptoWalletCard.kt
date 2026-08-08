@@ -6,6 +6,7 @@
 package com.esposito.openwallet.feature.cryptowallet.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.esposito.openwallet.core.domain.model.CryptoWallet
 import com.esposito.openwallet.core.ui.components.BaseCard
 import com.esposito.openwallet.core.ui.components.CategoryChip
-import com.esposito.openwallet.core.ui.components.StandardCardLayout
 
 /**
  * High-quality crypto wallet card component
@@ -40,7 +40,7 @@ fun CryptoWalletCard(
         onClick = onClick,
         onLongClick = onLongClick,
         modifier = modifier,
-        height = 140.dp,
+        height = 150.dp,
         backgroundBrush = Brush.linearGradient(
             colors = listOf(
                 cryptoStyle.backgroundColor.copy(alpha = 0.9f),
@@ -60,8 +60,12 @@ fun CryptoWalletCard(
         cornerRadius = 20.dp,
         contentPadding = 20.dp
     ) {
-        StandardCardLayout(
-            header = {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 // Crypto chip
                 CategoryChip(
                     text = wallet.tokenSymbol ?: wallet.symbol,
@@ -71,7 +75,6 @@ fun CryptoWalletCard(
                     modifier = Modifier.padding(end = 8.dp)
                 )
 
-                // Address info
                 Column(horizontalAlignment = Alignment.End) {
                     if (wallet.network.lowercase() != "mainnet") {
                         Text(
@@ -90,8 +93,18 @@ fun CryptoWalletCard(
                         fontWeight = FontWeight.Medium
                     )
                 }
-            },
-            footer = {
+            }
+
+            Box(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color.White.copy(alpha = 0.22f))
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+            Column {
                 Text(
                     text = wallet.name,
                     style = MaterialTheme.typography.headlineSmall,
@@ -115,6 +128,6 @@ fun CryptoWalletCard(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-        )
+        }
     }
 }

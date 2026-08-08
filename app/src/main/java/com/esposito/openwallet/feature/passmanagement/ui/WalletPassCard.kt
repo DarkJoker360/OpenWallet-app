@@ -29,7 +29,6 @@ import com.esposito.openwallet.core.domain.model.PassType
 import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.ui.components.BaseCard
 import com.esposito.openwallet.core.ui.components.CategoryChip
-import com.esposito.openwallet.core.ui.components.StandardCardLayout
 import com.esposito.openwallet.core.util.PassTypeUtils
 import com.esposito.openwallet.R
 
@@ -74,26 +73,28 @@ private fun ManualPassCard(
         onClick = onClick,
         onLongClick = onLongClick,
         modifier = modifier,
-        height = 200.dp,
+        height = 184.dp,
         backgroundBrush = if (pass.imageData != null) {
             // Will be overridden by AsyncImage
             Brush.linearGradient(colors = listOf(Color.Transparent, Color.Transparent))
         } else {
             Brush.linearGradient(
                 colors = listOf(
-                    passColor.copy(alpha = 0.8f),
-                    passColor.copy(alpha = 0.6f)
-                )
+                    passColor.copy(alpha = 0.96f),
+                    passColor.copy(alpha = 0.72f)
+                ),
+                start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                end = androidx.compose.ui.geometry.Offset(900f, 900f)
             )
         },
         overlayBrush = Brush.verticalGradient(
             colors = listOf(
                 Color.Transparent,
-                Color.Black.copy(alpha = 0.7f)
+                Color.Black.copy(alpha = 0.58f)
             )
         ),
         elevation = 4.dp,
-        cornerRadius = 16.dp,
+        cornerRadius = 20.dp,
         contentPadding = 0.dp
     ) {
         // Background image if available
@@ -115,54 +116,60 @@ private fun ManualPassCard(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            StandardCardLayout(
-                header = {
-                    // Pass type indicator
-                    CategoryChip(
-                        text = PassTypeUtils.getPassTypeDisplayName(context, pass.type),
-                        icon = PassTypeUtils.getPassTypeIcon(pass.type.name),
-                        backgroundColor = PassTypeUtils.getPassTypeColor(pass.type.name),
-                        contentColor = Color.White
-                    )
-                },
-                footer = {
-                    val displayOrg = pass.logoText?.takeIf { it.isNotBlank() } ?: pass.organizationName
-                    if (displayOrg != pass.title && 
-                        !pass.title.contains(displayOrg, ignoreCase = true)) {
-                        Text(
-                            text = displayOrg,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
-                    }
-                    Text(
-                        text = pass.title,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    pass.description?.let { description ->
-                        val isGenericDescription = description.lowercase().run {
-                            contains("pass") || contains("ticket") || 
-                            equals(pass.title, ignoreCase = true) ||
-                            equals(pass.organizationName, ignoreCase = true) ||
-                            length < 5
-                        }
-                        if (!isGenericDescription) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        if (!pass.organizationName.equals(pass.title, ignoreCase = true)) {
                             Text(
-                                text = description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.7f),
+                                text = pass.organizationName,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = Color.White.copy(alpha = 0.9f),
+                                fontWeight = FontWeight.SemiBold,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(top = 4.dp)
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
+                    CategoryChip(
+                        text = PassTypeUtils.getPassTypeDisplayName(context, pass.type),
+                        icon = PassTypeUtils.getPassTypeIcon(pass.type.name),
+                        backgroundColor = Color.White.copy(alpha = 0.18f),
+                        contentColor = Color.White
+                    )
                 }
-            )
+
+                Box(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.White.copy(alpha = 0.22f))
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = pass.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                pass.description?.takeIf { it.isNotBlank() }?.let { description ->
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.76f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 3.dp)
+                    )
+                }
+            }
 
             // Logo in top right if available
             if (pass.logoData != null) {
