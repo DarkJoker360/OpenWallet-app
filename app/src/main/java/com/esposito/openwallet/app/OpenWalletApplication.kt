@@ -26,4 +26,5 @@ class OpenWalletApplication : Application() {
             }
         )
     }
+
 }

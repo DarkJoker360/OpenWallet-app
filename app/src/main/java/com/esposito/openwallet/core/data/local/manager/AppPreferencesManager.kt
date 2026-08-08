@@ -38,6 +38,7 @@ class AppPreferencesManager(context: Context) {
         private const val KEY_AUTO_LOCK_TIMEOUT_MINUTES = "auto_lock_timeout_minutes"
 
         private const val KEY_FIRST_LAUNCH = "first_launch"
+        private const val KEY_WALLET_UI_CACHE = "wallet_ui_cache"
 
         // Default values
         private const val DEFAULT_ONBOARDING_COMPLETED = false
@@ -107,6 +108,12 @@ class AppPreferencesManager(context: Context) {
     var isFirstLaunch: Boolean
         get() = sharedPrefs.getBoolean(KEY_FIRST_LAUNCH, DEFAULT_FIRST_LAUNCH)
         set(value) = sharedPrefs.edit { putBoolean(KEY_FIRST_LAUNCH, value) }
+
+    fun getWalletUiCache(): String? = sharedPrefs.getString(KEY_WALLET_UI_CACHE, null)
+
+    fun setWalletUiCache(value: String) {
+        sharedPrefs.edit { putString(KEY_WALLET_UI_CACHE, value) }
+    }
 
     /**
      * Clear only onboarding-related preferences

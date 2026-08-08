@@ -8,19 +8,24 @@ package com.esposito.openwallet.core.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.esposito.openwallet.core.data.repository.WalletRepository
+import com.esposito.openwallet.core.data.local.manager.AppPreferencesManager
 import com.esposito.openwallet.core.domain.model.CreditCard
 import com.esposito.openwallet.core.domain.model.CryptoWallet
 import com.esposito.openwallet.core.domain.model.Pass
 import com.esposito.openwallet.core.domain.model.WalletPass
 import com.esposito.openwallet.core.util.SecureLogger
 import com.google.gson.JsonParser
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -90,7 +95,9 @@ private fun WalletPass.toPass(): Pass {
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val walletRepository: WalletRepository
+    private val walletRepository: WalletRepository,
+    private val appPreferences: AppPreferencesManager,
+    private val gson: Gson
 ) : ViewModel() {
 
     private val TAG = "MainViewModel"
@@ -100,22 +107,61 @@ class MainViewModel @Inject constructor(
     private val _showArchived = MutableStateFlow(false)
     private val _isLoading = MutableStateFlow(false)
     private val _errorMessage = MutableStateFlow<String?>(null)
+    private val cachedWallet = runCatching {
+        appPreferences.getWalletUiCache()?.let { gson.fromJson(it, WalletUiCache::class.java) }
+    }.getOrNull()
+    private val _passes = MutableStateFlow(cachedWallet?.passes ?: emptyList())
+    private val _creditCards = MutableStateFlow(cachedWallet?.creditCards ?: emptyList())
+    private val _cryptoWallets = MutableStateFlow(cachedWallet?.cryptoWallets ?: emptyList())
+
+    init {
+        viewModelScope.launch {
+            walletRepository.getAllPasses().collect { passes ->
+                _passes.value = withContext(Dispatchers.Default) {
+                    passes.map { it.toPass() }
+                }
+                persistWalletUiCache()
+            }
+        }
+        viewModelScope.launch {
+            walletRepository.getAllCreditCards().collect {
+                _creditCards.value = it
+                persistWalletUiCache()
+            }
+        }
+        viewModelScope.launch {
+            walletRepository.getAllCryptoWallets().collect {
+                _cryptoWallets.value = it
+                persistWalletUiCache()
+            }
+        }
+    }
+
+    private fun persistWalletUiCache() {
+        viewModelScope.launch(Dispatchers.Default) {
+            runCatching {
+                appPreferences.setWalletUiCache(
+                    gson.toJson(WalletUiCache(_passes.value, _creditCards.value, _cryptoWallets.value))
+                )
+            }
+        }
+    }
 
     /**
      * Combined UI state for the main screen
      */
     val uiState: StateFlow<MainUiState> = 
         combine(
-            walletRepository.getAllPasses(),
-            walletRepository.getAllCreditCards(),
-            walletRepository.getAllCryptoWallets(),
+            _passes,
+            _creditCards,
+            _cryptoWallets,
             _searchQuery,
             _isSearchActive,
             _showArchived,
             _isLoading,
             _errorMessage
         ) { data ->
-            val passes = (data[0] as? List<*>)?.filterIsInstance<WalletPass>() ?: emptyList()
+            val passes = (data[0] as? List<*>)?.filterIsInstance<Pass>() ?: emptyList()
             val creditCards = (data[1] as? List<*>)?.filterIsInstance<CreditCard>() ?: emptyList()
             val cryptoWallets = (data[2] as? List<*>)?.filterIsInstance<CryptoWallet>() ?: emptyList()
             val searchQuery = data[3] as? String ?: ""
@@ -125,7 +171,7 @@ class MainViewModel @Inject constructor(
             val errorMessage = data[7] as? String?
             
             MainUiState(
-                passes = passes.map { it.toPass() },
+                passes = passes,
                 creditCards = creditCards,
                 cryptoWallets = cryptoWallets,
                 searchQuery = searchQuery,
@@ -136,7 +182,7 @@ class MainViewModel @Inject constructor(
             )
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = MainUiState()
         )
 
@@ -214,3 +260,9 @@ class MainViewModel @Inject constructor(
     }
 
 }
+
+private data class WalletUiCache(
+    val passes: List<Pass> = emptyList(),
+    val creditCards: List<CreditCard> = emptyList(),
+    val cryptoWallets: List<CryptoWallet> = emptyList()
+)
