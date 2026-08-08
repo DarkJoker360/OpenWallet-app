@@ -61,7 +61,8 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit,
     onDeletePass: (String) -> Unit = {},
     onDeleteCreditCard: (String) -> Unit = {},
-    onDeleteCryptoWallet: (Long) -> Unit = {}
+    onDeleteCryptoWallet: (Long) -> Unit = {},
+    onNavigateToArchived: () -> Unit = {}
 ) {
     var showFabMenu by remember { mutableStateOf(false) }
     
@@ -111,6 +112,47 @@ fun MainScreen(
     ) { paddingValues ->
         MainContent(
             uiState = uiState,
+            paddingValues = paddingValues,
+            onNavigateToPassDetail = onNavigateToPassDetail,
+            onNavigateToCreditCardDetail = onNavigateToCreditCardDetail,
+            onNavigateToCryptoWalletDetail = onNavigateToCryptoWalletDetail,
+            onDeletePass = onDeletePass,
+            onDeleteCreditCard = onDeleteCreditCard,
+            onDeleteCryptoWallet = onDeleteCryptoWallet
+            ,onNavigateToArchived = onNavigateToArchived
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArchivedItemsScreen(
+    uiState: MainUiState,
+    onBack: () -> Unit,
+    onNavigateToPassDetail: (String) -> Unit,
+    onNavigateToCreditCardDetail: (String) -> Unit,
+    onNavigateToCryptoWalletDetail: (String) -> Unit,
+    onDeletePass: (String) -> Unit,
+    onDeleteCreditCard: (String) -> Unit,
+    onDeleteCryptoWallet: (Long) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.archived_items)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        MainContent(
+            uiState = uiState.copy(showArchived = true),
             paddingValues = paddingValues,
             onNavigateToPassDetail = onNavigateToPassDetail,
             onNavigateToCreditCardDetail = onNavigateToCreditCardDetail,

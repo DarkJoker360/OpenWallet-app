@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import java.util.Date
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.random.Random
@@ -67,6 +68,7 @@ class TestDataManager(
         generateMockupCreditCardsWithEnhancedEncryption(activity)
         generateMockupCryptoWallets()
         generateMockupWalletPasses()
+        generateMockupArchivedPasses()
     }
     
     /**
@@ -638,6 +640,72 @@ class TestDataManager(
         }
         
         SecureLogger.d(TAG, "Generated ${mockupPasses.size} wallet passes")
+    }
+
+    /**
+     * Generate deterministic archived passes for testing the archived-items flow.
+     * The IDs are stable so this action is safe to run repeatedly.
+     */
+    suspend fun generateMockupArchivedPasses() = withContext(Dispatchers.IO) {
+        val now = System.currentTimeMillis()
+        val archivedPasses = listOf(
+            WalletPass(
+                id = "archived_test_boarding_pass",
+                type = PassType.BOARDING_PASS,
+                title = "LH456 · FCO → FRA",
+                description = "Archived test boarding pass",
+                organizationName = "Lufthansa",
+                serialNumber = "ARCHIVE-LH456",
+                relevantDate = Date(now - 14 * 24 * 60 * 60 * 1000L),
+                expirationDate = Date(now - 14 * 24 * 60 * 60 * 1000L),
+                barcodeData = "M1ARCHIVED/TEST          LH456 FCOFRA 0001 012A001A0001",
+                barcodeFormat = BarcodeFormat.PDF417,
+                backgroundColor = "#263238",
+                foregroundColor = "#FFFFFF",
+                labelColor = "#B0BEC5",
+                passData = "{\"flightNumber\":\"LH456\",\"seat\":\"12A\",\"status\":\"expired\"}",
+                isArchived = true,
+                tags = listOf("test", "archived", "expired")
+            ),
+            WalletPass(
+                id = "archived_test_event_ticket",
+                type = PassType.EVENT_TICKET,
+                title = "OpenWallet Summit 2025",
+                description = "Archived test event ticket",
+                organizationName = "OpenWallet Events",
+                serialNumber = "ARCHIVE-OW-2025",
+                relevantDate = Date(now - 90 * 24 * 60 * 60 * 1000L),
+                expirationDate = Date(now - 90 * 24 * 60 * 60 * 1000L),
+                barcodeData = "https://tickets.example.test/archived/OW2025",
+                barcodeFormat = BarcodeFormat.QR,
+                backgroundColor = "#5E35B1",
+                foregroundColor = "#FFFFFF",
+                labelColor = "#D1C4E9",
+                passData = "{\"venue\":\"Rome Auditorium\",\"seat\":\"B-14\",\"status\":\"used\"}",
+                voided = true,
+                isArchived = true,
+                tags = listOf("test", "archived", "voided")
+            ),
+            WalletPass(
+                id = "archived_test_loyalty_card",
+                type = PassType.LOYALTY_CARD,
+                title = "Green Market Rewards",
+                description = "Archived test loyalty card",
+                organizationName = "Green Market",
+                serialNumber = "ARCHIVE-GM-001",
+                barcodeData = "GM-ARCHIVED-001",
+                barcodeFormat = BarcodeFormat.CODE128,
+                backgroundColor = "#33691E",
+                foregroundColor = "#FFFFFF",
+                labelColor = "#DCEDC8",
+                passData = "{\"points\":\"240\",\"status\":\"archived\"}",
+                isArchived = true,
+                tags = listOf("test", "archived", "loyalty")
+            )
+        )
+
+        archivedPasses.forEach { pass -> walletRepository.insertPass(pass) }
+        SecureLogger.d(TAG, "Generated ${archivedPasses.size} archived test passes")
     }
     /**
      * Generate a pass with relevant date 2 hours and 10 seconds from now

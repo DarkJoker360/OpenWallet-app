@@ -31,6 +31,7 @@ import com.esposito.openwallet.core.ui.navigation.MainNavigationHandler
 import com.esposito.openwallet.feature.authentication.ui.OnboardingActivity
 import com.esposito.openwallet.feature.passmanagement.ui.AddPassScreen
 import com.esposito.openwallet.core.ui.MainScreen
+import com.esposito.openwallet.core.ui.ArchivedItemsScreen
 import com.esposito.openwallet.core.ui.MainViewModel
 import com.esposito.openwallet.core.ui.theme.OpenWalletTheme
 import com.esposito.openwallet.core.util.FileImportHandler
@@ -171,7 +172,8 @@ class MainActivity : SecureActivity() {
                                 },
                                 onDeletePass = mainViewModel::deletePass,
                                 onDeleteCreditCard = mainViewModel::deleteCreditCard,
-                                onDeleteCryptoWallet = mainViewModel::deleteCryptoWallet
+                                onDeleteCryptoWallet = mainViewModel::deleteCryptoWallet,
+                                onNavigateToArchived = { navController.navigate("archived") }
                             )
                         }
                         
@@ -179,6 +181,18 @@ class MainActivity : SecureActivity() {
                             AddPassScreen(
                                 onBackClick = { navController.popBackStack() },
                                 onPassCreated = { navController.popBackStack() }
+                            )
+                        }
+                        composable("archived") {
+                            ArchivedItemsScreen(
+                                uiState = mainViewModel.uiState.collectAsState().value,
+                                onBack = { navController.popBackStack() },
+                                onNavigateToPassDetail = { id -> navigationHandler.navigateToPassDetail(this@MainActivity, id) },
+                                onNavigateToCreditCardDetail = { id -> navigationHandler.navigateToCreditCardDetail(this@MainActivity, id) },
+                                onNavigateToCryptoWalletDetail = { id -> navigationHandler.navigateToCryptoWalletDetail(this@MainActivity, id.toLongOrNull() ?: 0L) },
+                                onDeletePass = mainViewModel::deletePass,
+                                onDeleteCreditCard = mainViewModel::deleteCreditCard,
+                                onDeleteCryptoWallet = mainViewModel::deleteCryptoWallet
                             )
                         }
                     }

@@ -16,6 +16,9 @@
     <string name="ok">OK</string>
     <string name="error">Errore</string>
     <string name="search">Cerca</string>
+    <string name="show_archived_items">Mostra elementi archiviati</string>
+    <string name="hide_archived_items">Nascondi elementi archiviati</string>
+    <string name="archived_items">Elementi archiviati</string>
     <string name="invalid_crypto_address">Questo indirizzo non è valido per la blockchain e la rete selezionate.</string>
     <string name="selection">Selezionato</string>
     <string name="settings">Impostazioni</string>

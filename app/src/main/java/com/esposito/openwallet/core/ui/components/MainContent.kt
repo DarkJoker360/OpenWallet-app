@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -51,6 +52,7 @@ fun MainContent(
     onDeletePass: (String) -> Unit = {},
     onDeleteCreditCard: (String) -> Unit = {},
     onDeleteCryptoWallet: (Long) -> Unit = {},
+    onNavigateToArchived: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -75,6 +77,7 @@ fun MainContent(
                 onDeletePass = onDeletePass,
                 onDeleteCreditCard = onDeleteCreditCard,
                 onDeleteCryptoWallet = onDeleteCryptoWallet
+                ,onNavigateToArchived = onNavigateToArchived
             )
         }
     }
@@ -90,6 +93,7 @@ private fun WalletItemsList(
     onDeletePass: (String) -> Unit,
     onDeleteCreditCard: (String) -> Unit,
     onDeleteCryptoWallet: (Long) -> Unit,
+    onNavigateToArchived: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -196,6 +200,26 @@ private fun WalletItemsList(
                         showDeleteDialog = true
                     }
                 )
+            }
+        }
+
+        if (!uiState.showArchived && uiState.hasArchivedItems) {
+            item {
+                Divider(
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                TextButton(
+                    onClick = onNavigateToArchived,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        stringResource(
+                            if (uiState.showArchived) R.string.hide_archived_items
+                            else R.string.show_archived_items
+                        )
+                    )
+                }
             }
         }
 

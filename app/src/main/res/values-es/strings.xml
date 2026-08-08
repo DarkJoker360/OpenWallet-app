@@ -16,6 +16,9 @@
     <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="search">Buscar</string>
+    <string name="show_archived_items">Mostrar elementos archivados</string>
+    <string name="hide_archived_items">Ocultar elementos archivados</string>
+    <string name="archived_items">Elementos archivados</string>
     <string name="invalid_crypto_address">Esta dirección no es válida para la cadena de bloques y la red seleccionadas.</string>
     <string name="selection">Seleccionado</string>
     <string name="settings">Configuración</string>

@@ -18,6 +18,9 @@
     <string name="error">Error</string>
     <string name="search">Search</string>
     <string name="invalid_crypto_address">This address is not valid for the selected blockchain and network.</string>
+    <string name="show_archived_items">Show archived items</string>
+    <string name="hide_archived_items">Hide archived items</string>
+    <string name="archived_items">Archived items</string>
     <string name="selection">Selected</string>
     <string name="settings">Settings</string>
     <string name="close_search">Close search</string>

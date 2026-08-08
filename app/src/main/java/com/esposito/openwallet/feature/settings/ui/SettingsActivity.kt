@@ -5,6 +5,7 @@
 
 package com.esposito.openwallet.feature.settings.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -157,6 +158,7 @@ class SettingsActivity : SecureActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@SuppressLint("LocalContextGetResourceValueCall")
 fun SettingsScreen(
     onBackPressed: () -> Unit,
     appPrefs: AppPreferencesManager,
@@ -765,7 +767,7 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
             }
         }
     }
-    
+
     // Handle notification test generation
     LaunchedEffect(isGeneratingNotification) {
         if (isGeneratingNotification) {
@@ -812,6 +814,7 @@ private fun DeveloperOptionsCard(appPrefs: AppPreferencesManager) {
 }
 
 @Composable
+@SuppressLint("LocalContextGetResourceValueCall")
 private fun BackupRestoreCard(backupManager: BackupManager) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()

@@ -97,6 +97,7 @@ class MainViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
     private val _isSearchActive = MutableStateFlow(false)
+    private val _showArchived = MutableStateFlow(false)
     private val _isLoading = MutableStateFlow(false)
     private val _errorMessage = MutableStateFlow<String?>(null)
 
@@ -110,6 +111,7 @@ class MainViewModel @Inject constructor(
             walletRepository.getAllCryptoWallets(),
             _searchQuery,
             _isSearchActive,
+            _showArchived,
             _isLoading,
             _errorMessage
         ) { data ->
@@ -118,8 +120,9 @@ class MainViewModel @Inject constructor(
             val cryptoWallets = (data[2] as? List<*>)?.filterIsInstance<CryptoWallet>() ?: emptyList()
             val searchQuery = data[3] as? String ?: ""
             val isSearchActive = data[4] as? Boolean ?: false
-            val isLoading = data[5] as? Boolean ?: false
-            val errorMessage = data[6] as? String?
+            val showArchived = data[5] as? Boolean ?: false
+            val isLoading = data[6] as? Boolean ?: false
+            val errorMessage = data[7] as? String?
             
             MainUiState(
                 passes = passes.map { it.toPass() },
@@ -127,6 +130,7 @@ class MainViewModel @Inject constructor(
                 cryptoWallets = cryptoWallets,
                 searchQuery = searchQuery,
                 isSearchActive = isSearchActive,
+                showArchived = showArchived,
                 isLoading = isLoading,
                 errorMessage = errorMessage
             )

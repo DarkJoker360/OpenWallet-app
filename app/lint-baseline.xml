@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.13.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.2)" variant="all" version="8.13.2">
+<issues format="6" by="lint 9.1.1" type="baseline" client="gradle" dependencies="false" name="AGP (9.1.1)" variant="all" version="9.1.1">
 
     <issue
         id="DefaultLocale"
@@ -24,6 +24,83 @@
     </issue>
 
     <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                val checkDigits = String.format(&quot;%0${IBAN_CHECK_DIGITS_LENGTH}d&quot;, Random.nextInt(MIN_CHECK_DIGIT, MAX_CHECK_DIGIT))"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/core/data/local/manager/TestDataManager.kt"
+            line="353"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                val branchCode = String.format(&quot;%0${ITALIAN_IBAN_BRANCH_LENGTH}d&quot;, Random.nextInt(MIN_RANDOM_FIVE_DIGIT, MAX_RANDOM_FIVE_DIGIT))"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/core/data/local/manager/TestDataManager.kt"
+            line="356"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                val checkDigits = String.format(&quot;%0${IBAN_CHECK_DIGITS_LENGTH}d&quot;, Random.nextInt(MIN_CHECK_DIGIT, MAX_CHECK_DIGIT))"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/core/data/local/manager/TestDataManager.kt"
+            line="362"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                val checkDigits = String.format(&quot;%0${IBAN_CHECK_DIGITS_LENGTH}d&quot;, Random.nextInt(MIN_CHECK_DIGIT, MAX_CHECK_DIGIT))"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/core/data/local/manager/TestDataManager.kt"
+            line="369"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                val checkDigits = String.format(&quot;%0${IBAN_CHECK_DIGITS_LENGTH}d&quot;, Random.nextInt(MIN_CHECK_DIGIT, MAX_CHECK_DIGIT))"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/core/data/local/manager/TestDataManager.kt"
+            line="377"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                val key = String.format(&quot;%0${IBAN_CHECK_DIGITS_LENGTH}d&quot;, Random.nextInt(MIN_CHECK_DIGIT, MAX_CHECK_DIGIT))"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/core/data/local/manager/TestDataManager.kt"
+            line="381"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                val checkDigits = String.format(&quot;%0${IBAN_CHECK_DIGITS_LENGTH}d&quot;, Random.nextInt(MIN_CHECK_DIGIT, MAX_CHECK_DIGIT))"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/core/data/local/manager/TestDataManager.kt"
+            line="386"
+            column="35"/>
+    </issue>
+
+    <issue
         id="StartActivityAndCollapseDeprecated"
         message="TileService#startActivityAndCollapse(Intent) is deprecated. Use TileService#startActivityAndCollapse(PendingIntent) instead."
         errorLine1="            startActivityAndCollapse(intent)"
@@ -35,278 +112,47 @@
     </issue>
 
     <issue
-        id="AndroidGradlePluginVersion"
-        message="A newer version of Gradle than 8.14.3 is available: 8.14.5"
-        errorLine1="distributionUrl=https\://services.gradle.org/distributions/gradle-8.14.3-bin.zip"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        id="NonObservableLocale"
+        message="Reading locale in a non-observable way in a composable function"
+        errorLine1="                SimpleDateFormat(&quot;dd MMM yyyy&quot;, Locale.getDefault()).format(date)"
+        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~">
         <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/wrapper/gradle-wrapper.properties"
-            line="7"
-            column="17"/>
+            file="src/main/java/com/esposito/openwallet/feature/passmanagement/ui/BoardingPassDetailCard.kt"
+            line="288"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="NonObservableLocale"
+        message="Reading locale in a non-observable way in a composable function"
+        errorLine1="                            description = &quot;Expires ${String.format(&quot;%02d&quot;, creditCardData!!.expiryMonth, Locale.getDefault())}/${creditCardData!!.expiryYear}&quot;,"
+        errorLine2="                                                                                                         ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/feature/creditcard/ui/CreditCardDetailActivity.kt"
+            line="727"
+            column="106"/>
+    </issue>
+
+    <issue
+        id="NonObservableLocale"
+        message="Reading locale in a non-observable way in a composable function"
+        errorLine1="                    SimpleDateFormat(&quot;MMM dd, yyyy&quot;, Locale.getDefault(Locale.Category.FORMAT))"
+        errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/esposito/openwallet/feature/cryptowallet/ui/CryptoWalletDetailActivity.kt"
+            line="487"
+            column="54"/>
     </issue>
 
     <issue
         id="AndroidGradlePluginVersion"
-        message="A newer version of com.android.application than 8.13.2 is available: 9.3.1"
-        errorLine1="agp = &quot;8.13.2&quot;"
-        errorLine2="      ~~~~~~~~">
+        message="A newer version of com.android.application than 9.1.1 is available: 9.3.1"
+        errorLine1="agp = &quot;9.1.1&quot;"
+        errorLine2="      ~~~~~~~">
         <location
             file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
             line="5"
             column="7"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.19.0"
-        errorLine1="coreKtx = &quot;1.17.0&quot;"
-        errorLine2="          ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="8"
-            column="11"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.lifecycle:lifecycle-process than 2.10.0 is available: 2.11.0"
-        errorLine1="lifecycleRuntimeKtx = &quot;2.10.0&quot;"
-        errorLine2="                      ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="12"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.10.0 is available: 2.11.0"
-        errorLine1="lifecycleRuntimeKtx = &quot;2.10.0&quot;"
-        errorLine2="                      ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="12"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.10.0 is available: 2.11.0"
-        errorLine1="lifecycleRuntimeKtx = &quot;2.10.0&quot;"
-        errorLine2="                      ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="12"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.10.0 is available: 2.11.0"
-        errorLine1="lifecycleComposeKtx = &quot;2.10.0&quot;"
-        errorLine2="                      ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="13"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.activity:activity-compose than 1.12.2 is available: 1.13.0"
-        errorLine1="activityCompose = &quot;1.12.2&quot;"
-        errorLine2="                  ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="14"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.compose:compose-bom than 2025.12.01 is available: 2026.06.01"
-        errorLine1="composeBom = &quot;2025.12.01&quot;"
-        errorLine2="             ~~~~~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="15"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.navigation:navigation-compose than 2.9.6 is available: 2.9.8"
-        errorLine1="navigationCompose = &quot;2.9.6&quot;"
-        errorLine2="                    ~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="16"
-            column="21"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.activity:activity-ktx than 1.12.2 is available: 1.13.0"
-        errorLine1="activityKtx = &quot;1.12.2&quot;"
-        errorLine2="              ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="20"
-            column="15"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.sqlite:sqlite than 2.6.2 is available: 2.7.0"
-        errorLine1="sqlite = &quot;2.6.2&quot;"
-        errorLine2="         ~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="23"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.hilt:hilt-navigation-compose than 1.3.0 is available: 1.4.0"
-        errorLine1="hiltNavigationCompose = &quot;1.3.0&quot;"
-        errorLine2="                        ~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="29"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.camera:camera-camera2 than 1.5.2 is available: 1.6.1"
-        errorLine1="camera = &quot;1.5.2&quot;"
-        errorLine2="         ~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="31"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.camera:camera-core than 1.5.2 is available: 1.6.1"
-        errorLine1="camera = &quot;1.5.2&quot;"
-        errorLine2="         ~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="31"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.camera:camera-lifecycle than 1.5.2 is available: 1.6.1"
-        errorLine1="camera = &quot;1.5.2&quot;"
-        errorLine2="         ~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="31"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.camera:camera-view than 1.5.2 is available: 1.6.1"
-        errorLine1="camera = &quot;1.5.2&quot;"
-        errorLine2="         ~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="31"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="GradleDependency"
-        message="A newer version of androidx.work:work-runtime-ktx than 2.11.0 is available: 2.11.2"
-        errorLine1="work = &quot;2.11.0&quot;"
-        errorLine2="       ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="34"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of org.jetbrains.kotlin.android than 2.2.10 is available: 2.4.10"
-        errorLine1="kotlin = &quot;2.2.10&quot;"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="6"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of org.jetbrains.kotlin.plugin.compose than 2.2.10 is available: 2.4.10"
-        errorLine1="kotlin = &quot;2.2.10&quot;"
-        errorLine2="         ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="6"
-            column="10"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.google.code.gson:gson than 2.13.2 is available: 2.14.0"
-        errorLine1="gson = &quot;2.13.2&quot;"
-        errorLine2="       ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="19"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of net.zetetic:sqlcipher-android than 4.12.0 is available: 4.17.0"
-        errorLine1="sqlcipher = &quot;4.12.0&quot;"
-        errorLine2="            ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="26"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.google.dagger.hilt.android than 2.57.2 is available: 2.60.1"
-        errorLine1="hilt = &quot;2.57.2&quot;"
-        errorLine2="       ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="28"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.google.dagger:hilt-android than 2.57.2 is available: 2.60.1"
-        errorLine1="hilt = &quot;2.57.2&quot;"
-        errorLine2="       ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="28"
-            column="8"/>
-    </issue>
-
-    <issue
-        id="NewerVersionAvailable"
-        message="A newer version of com.google.dagger:hilt-compiler than 2.57.2 is available: 2.60.1"
-        errorLine1="hilt = &quot;2.57.2&quot;"
-        errorLine2="       ~~~~~~~~">
-        <location
-            file="$HOME/Android/app-dev/OpenWallet-app/gradle/libs.versions.toml"
-            line="28"
-            column="8"/>
     </issue>
 
     <issue
@@ -701,7 +547,7 @@
         errorLine2="    ~~~~~~~~">
         <location
             file="src/main/java/com/esposito/openwallet/core/ui/components/MainContent.kt"
-            line="54"
+            line="55"
             column="5"/>
     </issue>
 
@@ -712,7 +558,7 @@
         errorLine2="    ~~~~~~~~">
         <location
             file="src/main/java/com/esposito/openwallet/core/ui/components/MainContent.kt"
-            line="248"
+            line="267"
             column="5"/>
     </issue>
 
@@ -789,7 +635,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="418"
+            line="422"
             column="13"/>
     </issue>
 
@@ -800,7 +646,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="419"
+            line="423"
             column="13"/>
     </issue>
 
@@ -811,7 +657,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="420"
+            line="424"
             column="13"/>
     </issue>
 
@@ -822,7 +668,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="421"
+            line="425"
             column="13"/>
     </issue>
 
@@ -833,7 +679,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="422"
+            line="426"
             column="13"/>
     </issue>
 
@@ -844,7 +690,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="423"
+            line="427"
             column="13"/>
     </issue>
 
@@ -855,7 +701,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="424"
+            line="428"
             column="13"/>
     </issue>
 
@@ -866,7 +712,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="425"
+            line="429"
             column="13"/>
     </issue>
 
@@ -877,7 +723,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="426"
+            line="430"
             column="13"/>
     </issue>
 
@@ -888,7 +734,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="427"
+            line="431"
             column="13"/>
     </issue>
 
@@ -899,7 +745,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="428"
+            line="432"
             column="13"/>
     </issue>
 
@@ -910,7 +756,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="429"
+            line="433"
             column="13"/>
     </issue>
 
@@ -921,7 +767,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="430"
+            line="434"
             column="13"/>
     </issue>
 
@@ -932,7 +778,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="431"
+            line="435"
             column="13"/>
     </issue>
 
@@ -943,7 +789,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="432"
+            line="436"
             column="13"/>
     </issue>
 
@@ -954,7 +800,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="467"
+            line="471"
             column="5"/>
     </issue>
 
@@ -983,7 +829,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="85"
+            line="89"
             column="13"/>
     </issue>
 
@@ -994,7 +840,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="86"
+            line="90"
             column="13"/>
     </issue>
 
@@ -1005,7 +851,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="97"
+            line="101"
             column="13"/>
     </issue>
 
@@ -1016,7 +862,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="100"
+            line="104"
             column="13"/>
     </issue>
 
@@ -1027,7 +873,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="101"
+            line="105"
             column="13"/>
     </issue>
 
@@ -1038,7 +884,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="102"
+            line="106"
             column="13"/>
     </issue>
 
@@ -1049,7 +895,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="147"
+            line="151"
             column="13"/>
     </issue>
 
@@ -1060,7 +906,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="251"
+            line="255"
             column="13"/>
     </issue>
 
@@ -1071,7 +917,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="429"
+            line="433"
             column="13"/>
     </issue>
 
@@ -1082,7 +928,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="430"
+            line="434"
             column="13"/>
     </issue>
 
@@ -1093,7 +939,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="431"
+            line="435"
             column="13"/>
     </issue>
 
@@ -1104,7 +950,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="432"
+            line="436"
             column="13"/>
     </issue>
 
@@ -1115,7 +961,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="450"
+            line="454"
             column="13"/>
     </issue>
 
@@ -1126,7 +972,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="470"
+            line="474"
             column="13"/>
     </issue>
 
@@ -1137,7 +983,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="471"
+            line="475"
             column="13"/>
     </issue>
 
